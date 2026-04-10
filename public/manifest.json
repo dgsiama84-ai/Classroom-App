@@ -1,23 +1,22 @@
 {
-  "name": "STIE 25MA2",
-  "short_name": "STIE App",
+  "name": "STIE25MA2",
+  "short_name": "STIE25MA2",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#0f1117",
   "icons": [
-    {
-      "src": "/icon1.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
     {
       "src": "/apple-icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ],
-  "theme_color": "#0f1117",
-  "background_color": "#0f1117",
-  "display": "standalone",
-  "start_url": "/",
-  "scope": "/"
+  ]
 }

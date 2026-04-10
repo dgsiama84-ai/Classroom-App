@@ -4,12 +4,13 @@ import './globals.css'
 
 const geist = Geist({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'STIE APP — Sistem Kelas Digital',
-  description: 'Sistem Kelas Digital Mahasiswa',
-  manifest: '/manifest.json',
-  icons: {
-    apple: '/apple-icon.png',
+export const metadata = {
+  manifest: "/manifest.json",
+  themeColor: "#0f1117",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "STIE25MA2",
   },
 }
 
