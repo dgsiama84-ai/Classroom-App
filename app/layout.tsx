@@ -4,9 +4,9 @@ import './globals.css'
 
 const geist = Geist({ subsets: ['latin'] })
 
-export const metadata = {
+export const metadata: Metadata = {
   manifest: "/manifest.json",
-  themeColor: "#0f1117",
+  themeColor: "#000000",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -17,6 +17,9 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
+      <head>
+        <meta name="theme-color" content="#000000" />
+      </head>
       <body className={geist.className}>
         {children}
       </body>
