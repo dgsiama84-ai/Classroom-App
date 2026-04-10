@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
 import './globals.css'
+import { Ubuntu } from 'next/font/google'
 
-const geist = Geist({ subsets: ['latin'] })
+const font = Ubuntu({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+})
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -20,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="theme-color" content="#000000" />
       </head>
-      <body className={geist.className}>
+      <body className={font.className}>
         {children}
       </body>
     </html>
