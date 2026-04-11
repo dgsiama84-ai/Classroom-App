@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 const MODELS = [
-  'openrouter/free',                              // auto-router — coba ini dulu
+  'openrouter/free',
+  'mistralai/mistral-7b-instruct:free',
+  'google/gemma-2-9b-it:free',
 ]
 
 const DAILY_LIMIT = 5
