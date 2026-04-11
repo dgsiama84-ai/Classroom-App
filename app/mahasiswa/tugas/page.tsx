@@ -1,5 +1,5 @@
 'use client'
-
+import Spinner from '@/components/Spinner'
 import { useEffect, useState } from 'react'
 import { formatDateTime } from '@/lib/utils'
 
@@ -72,9 +72,7 @@ export default function TugasPage() {
   }
 
   if (loading) return (
-    <div className="flex justify-center py-10">
-      <div className="w-6 h-6 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
-    </div>
+    <Spinner />
   )
 
   return (

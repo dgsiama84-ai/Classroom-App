@@ -5,6 +5,7 @@ import { formatDateTime } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { getAdminSession } from '@/lib/auth'
 import Select from '@/components/select'
+import Spinner from '@/components/Spinner'
 
 interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
 interface Tugas {
@@ -157,9 +158,7 @@ useEffect(() => {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-10">
-          <div className="w-6 h-6 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
-        </div>
+        <Spinner />
       ) : list.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-3">📝</p>

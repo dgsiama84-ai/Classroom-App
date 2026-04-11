@@ -56,7 +56,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'radial-gradient(ellipse at 50% 0%, #294d29 0%, #0f1712 60%)' }}>
+      style={{ background: 'radial-gradient(ellipse at 50% 0%, #1f331a 0%, #0f1710 60%)' }}>
       <div className="w-full max-w-sm fade-in">
 
         {/* Logo */}

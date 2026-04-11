@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getMahasiswaSession } from '@/lib/auth'
+import Spinner from '@/components/Spinner'
 
 interface AbsensiRecord {
   id: string
@@ -86,9 +87,7 @@ export default function RiwayatPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-10">
-          <div className="w-6 h-6 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
-        </div>
+        <Spinner />
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-3">📭</p>
