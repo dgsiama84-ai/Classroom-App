@@ -1,14 +1,16 @@
 export default function Spinner() {
   return (
-    <div className="flex justify-center py-10">
-      <div style={{
-        width: '24px',
-        height: '24px',
-        borderRadius: '50%',
-        border: '2px solid var(--accent)',
-        borderTopColor: 'transparent',
-        animation: 'spin 0.7s linear infinite',
-      }} />
+    <div className="flex justify-center items-center py-10 gap-1">
+      {[0, 1, 2, 3].map(i => (
+        <div key={i} style={{
+          width: '4px',
+          height: '24px',
+          borderRadius: '2px',
+          background: 'var(--accent)',
+          animation: 'bar 0.9s ease-in-out infinite',
+          animationDelay: `${i * 0.1}s`,
+        }} />
+      ))}
     </div>
   )
 }
