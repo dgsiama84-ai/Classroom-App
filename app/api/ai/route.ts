@@ -35,7 +35,7 @@ async function tryModel(model: string, messages: Message[], systemPrompt: string
       },
       body: JSON.stringify({
         model,
-        max_tokens: 300,
+        max_tokens: 800,
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages,
@@ -63,7 +63,7 @@ async function tryModel(model: string, messages: Message[], systemPrompt: string
   if (!reply) throw new Error(`Model ${model} tidak menghasilkan respons`)
 
   // 🔥 safety limit
-  return reply.length > 500 ? reply.slice(0, 500) + '...' : reply
+  return reply
 }
 async function checkAndIncrementCredit(nim: string): Promise<{ allowed: boolean; remaining: number }> {
   const today = new Date().toISOString().split('T')[0]
