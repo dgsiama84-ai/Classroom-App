@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import jsQR from 'jsqr'
+import { pressProps } from '@/components/pressProps'
 
 interface AbsensiResult {
   nama: string
@@ -204,10 +205,10 @@ export default function AbsenPage() {
           <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
             Pertemuan {result.pertemuan} · {result.tanggal} · {result.waktu}
           </p>
-          <button onClick={() => setResult(null)}
+          <button onClick={() => setResult(null)} {...pressProps}
             className="w-full mt-6 py-3 rounded-xl text-sm font-semibold"
             style={{ background: 'var(--accent)', color: 'white' }}>
-            🔄 Scan Lagi
+            Ok
           </button>
         </div>
       </div>
@@ -257,15 +258,15 @@ export default function AbsenPage() {
         {/* 2 tombol card — hanya saat tidak live scan */}
         {!liveScanning && (
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={startLiveScan}
-              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all transition-all active:scale-95 active:opacity-80"
+            <button onClick={startLiveScan} {...pressProps}
+              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
               style={{ background: 'var(--surface2)', border: '2px dashed var(--border)' }}>
               <span className="text-3xl">📷</span>
               <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>Scan Live</span>
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Buka kamera</span>
             </button>
-            <button onClick={() => galeriRef.current?.click()} disabled={scanning}
-              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all transition-all active:scale-95 active:opacity-80"
+            <button onClick={() => galeriRef.current?.click()} disabled={scanning} {...pressProps}
+              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
               style={{ background: 'var(--surface2)', border: '2px dashed var(--border)' }}>
               <span className="text-3xl">🖼️</span>
               <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>Upload QR</span>
@@ -276,8 +277,8 @@ export default function AbsenPage() {
 
         {/* Batal live scan */}
         {liveScanning && (
-          <button onClick={stopCamera}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 active:opacity-80"
+          <button onClick={stopCamera} {...pressProps}
+            className="w-full py-3 rounded-xl text-sm font-semibold"
             style={{ background: 'var(--surface2)', color: 'var(--text-muted)' }}>
             Batal
           </button>
@@ -307,8 +308,8 @@ export default function AbsenPage() {
 
             {error && <p className="text-sm text-red-400">❌ {error}</p>}
 
-            <button onClick={handleSubmit} disabled={loading}
-              className="w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 active:opacity-80"
+            <button onClick={handleSubmit} disabled={loading} {...pressProps}
+              className="w-full py-3 rounded-xl text-sm font-semibold"
               style={{ background: 'var(--accent)', color: 'white', opacity: loading ? 0.6 : 1 }}>
               {loading ? '⏳ Menyimpan...' : '✓ Tandai Hadir'}
             </button>
