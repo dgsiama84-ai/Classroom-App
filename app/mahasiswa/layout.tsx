@@ -9,7 +9,7 @@ const navItems = [
   { href: '/mahasiswa/absensi', label: 'Absensi', icon: '📋' },
   { href: '/mahasiswa/tugas', label: 'Tugas', icon: '📚' },
   { href: '/mahasiswa/riwayat', label: 'Riwayat', icon: '📊' },
-  { href: '/mahasiswa/ai', label: 'AI Tutor', icon: '🤖' },
+  { href: '/mahasiswa/ai', label: 'Asisten', icon: '🤖' },
 ]
 
 export default function MahasiswaLayout({ children }: { children: React.ReactNode }) {
