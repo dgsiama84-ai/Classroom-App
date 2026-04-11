@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { pressProps } from '@/components/pressProps'
 
 interface AbsensiResult {
   nama: string
@@ -147,8 +148,8 @@ export default function AbsenPage() {
 
           {error && <p className="text-sm text-red-400">❌ {error}</p>}
 
-          <button onClick={handleSubmit} disabled={loading || (!isLoggedIn && !nim.trim())}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
+          <button onClick={handleSubmit} {...pressProps}
+          className="w-full py-3 rounded-xl text-sm font-semibold"
             style={{
               background: 'var(--accent)',
               color: 'white',

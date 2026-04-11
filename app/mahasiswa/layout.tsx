@@ -1,5 +1,5 @@
 'use client'
-
+import { pressProps } from '@/components/pressProps'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
@@ -42,11 +42,13 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs truncate max-w-[120px]" style={{ color: 'var(--text-muted)' }}>{nama}</span>
-          <button onClick={handleLogout}
-            className="text-xs px-2.5 py-1.5 rounded-lg"
-            style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-            Keluar
-          </button>
+          {/* Tombol keluar */}
+<button onClick={handleLogout}
+  {...pressProps}
+  className="text-xs px-2.5 py-1.5 rounded-lg"
+  style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+  Keluar
+</button>
         </div>
       </div>
 
@@ -55,18 +57,24 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
         {children}
       </main>
 
-      {/* Bottom Navbar */}
+      {/* Bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex"
         style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
         {navItems.map(item => {
           const isActive = pathname === item.href
           return (
-            <Link key={item.href} href={item.href}
-              className="flex-1 flex flex-col items-center gap-1 py-3 transition-all"
-              style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }}>
+            <button key={item.href}
+              onClick={() => router.push(item.href)}
+              {...pressProps}
+              className="flex-1 flex flex-col items-center gap-1 py-3"
+              style={{
+                color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                background: 'none',
+                border: 'none',
+              }}>
               <span className="text-xl">{item.icon}</span>
               <span className="text-xs font-medium">{item.label}</span>
-            </Link>
+            </button>
           )
         })}
       </nav>

@@ -8,7 +8,7 @@
   --surface2: #293625;
   --border: #2e472e;
   --accent: #27a429;
-  --accent-light: np#46ac32;
+  --accent-light:#46ac32;
   --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
@@ -91,4 +91,8 @@ body {
 @keyframes bar {
   0%, 100% { transform: scaleY(0.4); opacity: 0.4; }
   50% { transform: scaleY(1); opacity: 1; }
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
 }

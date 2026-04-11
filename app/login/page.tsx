@@ -3,6 +3,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { saveMahasiswaSession, saveAdminSession, getMahasiswaSession, getAdminSession } from '@/lib/auth'
+import { pressProps } from '@/components/pressProps'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -73,10 +74,11 @@ export default function LoginPage() {
         <div className="flex rounded-xl p-1 mb-6" style={{ background: 'var(--surface)' }}>
           {(['mahasiswa', 'admin'] as const).map(m => (
             <button key={m} onClick={() => { setMode(m); setError('') }}
-              className="flex-1 py-2 rounded-lg text-sm font-medium transition-all"
-              style={{
-                background: mode === m ? 'var(--accent)' : 'transparent',
-                color: mode === m ? 'white' : 'var(--text-muted)',
+              {...pressProps}
+  className="flex-1 py-2 rounded-lg text-sm font-medium transition-all"
+  style={{
+    background: mode === m ? 'var(--accent)' : 'transparent',
+    color: mode === m ? 'white' : 'var(--text-muted)',
               }}>
               {m === 'mahasiswa' ? 'Mahasiswa' : 'Admin'}
             </button>
@@ -91,17 +93,18 @@ export default function LoginPage() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>NIM</label>
                 <input type="text" value={nim} onChange={e => setNim(e.target.value)}
                   placeholder="Masukkan NIM kamu" required
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all active:scale-95 active:opacity-80"
                   style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)' }}
                   onFocus={e => e.target.style.borderColor = 'var(--accent)'}
                   onBlur={e => e.target.style.borderColor = 'var(--border)'} />
               </div>
               {error && <p className="text-sm text-red-400">{error}</p>}
-              <button type="submit" disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: 'var(--accent)', color: 'white', opacity: loading ? 0.6 : 1 }}>
-                {loading ? 'Memeriksa...' : 'Masuk'}
-              </button>
+             <button type="submit" disabled={loading}
+  {...pressProps}
+  className={`w-full px-4 py-3 rounded-xl text-sm font-semibold ${loading ? 'opacity-60' : ''}`}
+  style={{ background: 'var(--accent)', color: 'white' }}>
+  {loading ? 'Memeriksa...' : 'Masuk'}
+</button>
             </form>
           ) : (
             <form onSubmit={handleAdminLogin} className="space-y-4">
@@ -124,18 +127,20 @@ export default function LoginPage() {
                     onFocus={e => e.target.style.borderColor = 'var(--accent)'}
                     onBlur={e => e.target.style.borderColor = 'var(--border)'} />
                   <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
-                    style={{ color: 'var(--text-muted)' }}>
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+  {...pressProps}
+  className="absolute right-3 top-1/2 -translate-y-1/2"
+  style={{ color: 'var(--text-muted)' }}>
+  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+</button>
                 </div>
               </div>
               {error && <p className="text-sm text-red-400">{error}</p>}
               <button type="submit" disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold"
-                style={{ background: 'var(--accent)', color: 'white', opacity: loading ? 0.6 : 1 }}>
-                {loading ? 'Memeriksa...' : 'Masuk sebagai Admin'}
-              </button>
+  {...pressProps}
+  className={`w-full py-3 rounded-xl text-sm font-semibold ${loading ? 'opacity-60' : ''}`}
+  style={{ background: 'var(--accent)', color: 'white' }}>
+  {loading ? 'Memeriksa...' : 'Masuk sebagai Admin'}
+</button>
             </form>
           )}
         </div>

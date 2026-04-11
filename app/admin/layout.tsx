@@ -1,8 +1,8 @@
 'use client'
+import { pressProps } from '@/components/pressProps'
 import { getAdminSession, clearSession } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import Link from 'next/link'
 
 const navItems = [
   { href: '/admin/absensi', label: 'Absensi', icon: '📋' },
@@ -39,24 +39,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <nav className="flex-1 space-y-1">
           {navItems.map(item => (
-            <Link key={item.href} href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all"
+            <button key={item.href}
+              onClick={() => router.push(item.href)}
+              {...pressProps}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all"
               style={{
                 background: pathname === item.href ? 'var(--accent)' : 'transparent',
                 color: pathname === item.href ? 'white' : 'var(--text-muted)',
+                border: 'none',
               }}>
               <span>{item.icon}</span>
               {item.label}
-            </Link>
+            </button>
           ))}
         </nav>
 
         <div className="pt-4 mt-4" style={{ borderTop: '1px solid var(--border)' }}>
           <div className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Login sebagai</div>
-          <div className="text-sm font-medium truncate">{adminName}</div>
-          <button onClick={handleLogout}
-            className="mt-3 w-full text-xs text-left transition-all"
-            style={{ color: 'var(--text-muted)' }}>
+          <div className="text-sm font-medium truncate mb-2">{adminName}</div>
+          <button onClick={handleLogout} {...pressProps}
+            className="text-xs px-2.5 py-1.5 rounded-lg"
+            style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
             Keluar →
           </button>
         </div>
@@ -68,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <span className="font-bold text-sm">Admin</span>
         <div className="flex items-center gap-3">
           <span className="text-xs truncate max-w-[100px]" style={{ color: 'var(--text-muted)' }}>{adminName}</span>
-          <button onClick={handleLogout}
+          <button onClick={handleLogout} {...pressProps}
             className="text-xs px-2.5 py-1.5 rounded-lg"
             style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
             Keluar
@@ -87,12 +90,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {navItems.map(item => {
           const isActive = pathname === item.href
           return (
-            <Link key={item.href} href={item.href}
-              className="flex-1 flex flex-col items-center gap-1 py-3 transition-all"
-              style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }}>
+            <button key={item.href}
+              onClick={() => router.push(item.href)}
+              {...pressProps}
+              className="flex-1 flex flex-col items-center gap-1 py-3"
+              style={{
+                color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                background: 'none',
+                border: 'none',
+              }}>
               <span className="text-xl">{item.icon}</span>
               <span className="text-xs font-medium">{item.label}</span>
-            </Link>
+            </button>
           )
         })}
       </nav>

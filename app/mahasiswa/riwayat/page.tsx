@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getMahasiswaSession } from '@/lib/auth'
 import Spinner from '@/components/Spinner'
+import { pressProps } from '@/components/pressProps'
 
 interface AbsensiRecord {
   id: string
@@ -64,8 +65,8 @@ export default function RiwayatPage() {
 
       {/* Filter matkul */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar">
-        <button onClick={() => setFilter('semua')}
-          className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+        <button onClick={() => setFilter('semua')} {...pressProps}
+          className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium"
           style={{
             background: filter === 'semua' ? 'var(--accent)' : 'var(--surface)',
             color: filter === 'semua' ? 'white' : 'var(--text-muted)',
@@ -74,8 +75,8 @@ export default function RiwayatPage() {
           Semua
         </button>
         {matkulList.map(([id, mk]) => (
-          <button key={id} onClick={() => setFilter(id)}
-            className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+          <button key={id} onClick={() => setFilter(id)} {...pressProps}
+            className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium"
             style={{
               background: filter === id ? 'var(--accent)' : 'var(--surface)',
               color: filter === id ? 'white' : 'var(--text-muted)',

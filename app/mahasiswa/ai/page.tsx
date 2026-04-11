@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { getMahasiswaSession } from '@/lib/auth'
+import { pressProps } from '@/components/pressProps'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -95,7 +96,7 @@ export default function AIPage() {
           </p>
         </div>
         {messages.length > 0 && (
-          <button onClick={clearChat}
+          <button onClick={clearChat} {...pressProps}
             className="text-xs px-3 py-1.5 rounded-lg"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
             Hapus chat
@@ -118,7 +119,7 @@ export default function AIPage() {
             </div>
             <div className="flex flex-wrap gap-2 justify-center mt-2">
               {['Jelaskan konsep OOP', 'Cara buat laporan praktikum', 'Tips belajar efektif'].map(s => (
-                <button key={s} onClick={() => setInput(s)}
+                <button key={s} onClick={() => setInput(s)} {...pressProps}
                   className="text-xs px-3 py-1.5 rounded-lg"
                   style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
                   {s}
@@ -186,8 +187,8 @@ export default function AIPage() {
             onFocus={e => e.target.style.borderColor = 'var(--accent)'}
             onBlur={e => e.target.style.borderColor = 'var(--border)'}
           />
-          <button onClick={sendMessage} disabled={!input.trim() || loading}
-            className="w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
+          <button onClick={sendMessage} disabled={!input.trim() || loading} {...pressProps}
+            className="w-11 h-11 rounded-xl flex items-center justify-center"
             style={{
               background: input.trim() && !loading ? 'var(--accent)' : 'var(--surface)',
               color: input.trim() && !loading ? 'white' : 'var(--text-muted)',

@@ -5,6 +5,8 @@ import { useEffect, useState, useRef } from 'react'
 import QRCode from 'qrcode'
 import { formatDate, formatTime } from '@/lib/utils'
 import Select from '@/components/select'
+import { pressProps } from '@/components/pressProps'
+
 
 interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
 interface QRSession { id: string; mata_kuliah_id: string; kelas: string; pertemuan: number; expires_at: string }
@@ -260,7 +262,7 @@ export default function AdminAbsensiPage() {
       <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>{adminNama}</p>
       <div className="flex rounded-xl p-1 mb-5" style={{ background: 'var(--surface)' }}>
         {(['generate', 'rekap'] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)}
+          <button key={t} onClick={() => setTab(t)} {...pressProps}
             className="flex-1 py-2 rounded-lg text-sm font-medium transition-all"
             style={{
               background: tab === t ? 'var(--accent)' : 'transparent',
@@ -304,7 +306,7 @@ export default function AdminAbsensiPage() {
               <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--text-muted)' }}>Durasi QR (menit)</label>
               <div className="flex gap-2">
                 {['5', '10', '15', '30'].map(d => (
-                  <button key={d} onClick={() => setDurasi(d)}
+                  <button key={d} onClick={() => setDurasi(d)} {...pressProps}
                     className="flex-1 py-2 rounded-lg text-sm font-medium transition-all"
                     style={{
                       background: durasi === d ? 'var(--accent)' : 'var(--surface2)',
@@ -317,16 +319,16 @@ export default function AdminAbsensiPage() {
               </div>
             </div>
             {/* Tombol generate */}
-<button
-  onClick={generateQR}
-  disabled={!matkulId || !kelas || !pertemuan || loading}
-  className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${loading ? 'btn-pulse' : ''}`}
-  style={{
-    background: matkulId && kelas && pertemuan ? 'var(--accent)' : 'var(--surface2)',
-    color: matkulId && kelas && pertemuan ? 'white' : 'var(--text-muted)',
-  }}>
-  {loading ? '⏳ Membuat QR...' : '📲 Generate QR'}
-</button>
+            <button
+             onClick={generateQR} {...pressProps}
+             disabled={!matkulId || !kelas || !pertemuan || loading}
+             className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${loading ? 'btn-pulse' : ''}`}
+             style={{
+              background: matkulId && kelas && pertemuan ? 'var(--accent)' : 'var(--surface2)',
+              color: matkulId && kelas && pertemuan ? 'white' : 'var(--text-muted)',
+              }}>
+                {loading ? '⏳ Membuat QR...' : '📲 Generate QR'}
+            </button>
           </div>
 
           {/* List pertemuan + lock */}
@@ -348,7 +350,7 @@ export default function AdminAbsensiPage() {
                   </div>
                   {!log.is_locked ? (
                     <button
-                    onClick={() => handleLock(log.pertemuan, true)}
+                    onClick={() => handleLock(log.pertemuan, true)} {...pressProps}
                     disabled={lockingPertemuan === log.pertemuan}
                     className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all"
                     style={{ background: '#ef444420', color: '#ef4444' }}>
@@ -374,7 +376,7 @@ export default function AdminAbsensiPage() {
                 <span className="truncate flex-1 text-left" style={{ color: 'var(--text-muted)' }}>
                   {`${window.location.origin}/absen?token=${activeSession.id}`}
                 </span>
-                <button onClick={handleCopy}
+                <button onClick={handleCopy} {...pressProps}
                   className="shrink-0 px-2 py-1 rounded-lg font-medium text-xs transition-all"
                   style={{ background: copied ? '#22c55e' : 'var(--accent)', color: 'white' }}>
                   {copied ? '✓ Copied!' : 'Copy'}
@@ -402,9 +404,9 @@ export default function AdminAbsensiPage() {
             <p className="text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
               Sync dari Google Sheets
             </p>
-            <button onClick={importFromSheets} disabled={importing}
-              className="w-full py-2.5 rounded-xl text-sm font-medium"
-              style={{ background: importing ? 'var(--surface2)' : 'var(--accent)', color: 'white' }}>
+            <button onClick={importFromSheets} disabled={importing} {...pressProps}
+            className="w-full py-2.5 rounded-xl text-sm font-medium"
+             style={{ background: 'var(--accent)', color: 'white' }}>
               {importing ? '⏳ Mengimpor...' : '📥 Import Data Sheets'}
             </button>
             {importResult && (
@@ -439,13 +441,13 @@ export default function AdminAbsensiPage() {
                     value: String(i + 1), label: `Pertemuan ${i + 1}`
                   }))} />
               </div>
-            </div>
-            <button onClick={loadRekap}
-              className="w-full py-2.5 rounded-xl text-sm font-medium"
-              style={{ background: 'var(--accent)', color: 'white' }}>
-              Tampilkan
-            </button>
-          </div>
+           </div>
+             <button onClick={loadRekap} {...pressProps}
+             className="w-full py-2.5 rounded-xl text-sm font-medium"
+               style={{ background: 'var(--accent)', color: 'white' }}>
+                Tampilkan
+              </button>
+           </div>
 
           {rekapPertemuan.length > 0 ? (
             <div>

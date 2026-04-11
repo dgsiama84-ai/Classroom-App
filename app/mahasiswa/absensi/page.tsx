@@ -258,14 +258,14 @@ export default function AbsenPage() {
         {!liveScanning && (
           <div className="grid grid-cols-2 gap-3">
             <button onClick={startLiveScan}
-              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
+              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all transition-all active:scale-95 active:opacity-80"
               style={{ background: 'var(--surface2)', border: '2px dashed var(--border)' }}>
               <span className="text-3xl">📷</span>
               <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>Scan Live</span>
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Buka kamera</span>
             </button>
             <button onClick={() => galeriRef.current?.click()} disabled={scanning}
-              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
+              className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all transition-all active:scale-95 active:opacity-80"
               style={{ background: 'var(--surface2)', border: '2px dashed var(--border)' }}>
               <span className="text-3xl">🖼️</span>
               <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>Upload QR</span>
@@ -277,7 +277,7 @@ export default function AbsenPage() {
         {/* Batal live scan */}
         {liveScanning && (
           <button onClick={stopCamera}
-            className="w-full py-3 rounded-xl text-sm font-semibold"
+            className="w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 active:opacity-80"
             style={{ background: 'var(--surface2)', color: 'var(--text-muted)' }}>
             Batal
           </button>
@@ -308,7 +308,7 @@ export default function AbsenPage() {
             {error && <p className="text-sm text-red-400">❌ {error}</p>}
 
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
+              className="w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 active:opacity-80"
               style={{ background: 'var(--accent)', color: 'white', opacity: loading ? 0.6 : 1 }}>
               {loading ? '⏳ Menyimpan...' : '✓ Tandai Hadir'}
             </button>

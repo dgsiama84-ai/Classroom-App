@@ -82,9 +82,9 @@ useEffect(() => {
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-bold">Tugas</h2>
         <button onClick={() => setShowForm(!showForm)}
-          className="text-sm px-3 py-1.5 rounded-lg font-medium"
-          style={{ background: 'var(--accent)', color: 'white' }}>
-          {showForm ? '✕ Tutup' : '+ Tambah'}
+         className="text-sm px-3 py-1.5 rounded-lg font-medium transition-all active:scale-95 active:opacity-80"
+         style={{ background: 'var(--accent)', color: 'white' }}>
+         {showForm ? '✕ Tutup' : '+ Tambah'}
         </button>
       </div>
       <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>{list.length} tugas</p>
@@ -150,9 +150,9 @@ useEffect(() => {
           </div>
           {error && <p className="text-xs text-red-400">{error}</p>}
           <button onClick={handleAdd} disabled={saving}
-            className="w-full py-2.5 rounded-xl text-sm font-semibold"
-            style={{ background: 'var(--accent)', color: 'white', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Menyimpan...' : 'Simpan Tugas'}
+           className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 active:opacity-80"
+           style={{ background: 'var(--accent)', color: 'white', opacity: saving ? 0.6 : 1 }}>
+           {saving ? 'Menyimpan...' : 'Simpan Tugas'}
           </button>
         </div>
       )}
@@ -184,10 +184,10 @@ useEffect(() => {
                   </p>
                 </div>
                 <button onClick={() => handleDelete(t.id)} disabled={deleting === t.id}
-                  className="text-xs px-3 py-1.5 rounded-lg flex-shrink-0"
-                  style={{ background: '#ef444415', color: 'var(--danger)' }}>
-                  {deleting === t.id ? '...' : 'Hapus'}
-                </button>
+                   className="text-xs px-3 py-1.5 rounded-lg flex-shrink-0 transition-all active:scale-95 active:opacity-80"
+                   style={{ background: '#ef444415', color: 'var(--danger)' }}>
+                   {deleting === t.id ? '...' : 'Hapus'}
+                  </button>
               </div>
             </div>
           ))}
