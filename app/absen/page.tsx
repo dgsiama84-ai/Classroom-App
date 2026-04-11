@@ -1,4 +1,5 @@
 'use client'
+import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { pressProps } from '@/components/pressProps'
@@ -11,7 +12,7 @@ interface AbsensiResult {
   waktu: string
 }
 
-export default function AbsenPage() {
+function AbsenContent() {
   const searchParams = useSearchParams()
 
   const [sessionId, setSessionId] = useState('')
@@ -41,60 +42,61 @@ export default function AbsenPage() {
   }, [searchParams])
 
   async function handleSubmit() {
-  if (!sessionId.trim()) { setError('Token tidak valid'); return }
-  if (!isLoggedIn && !nim.trim()) { setError('Masukkan NIM kamu'); return }
+    if (!sessionId.trim()) { setError('Token tidak valid'); return }
+    if (!isLoggedIn && !nim.trim()) { setError('Masukkan NIM kamu'); return }
 
-  setLoading(true)
-  setError('')
+    setLoading(true)
+    setError('')
 
-  try {
-    let token = localStorage.getItem('token')
+    try {
+      let token = localStorage.getItem('token')
 
-    if (!token) {
-      const loginRes = await fetch('/api/auth/mahasiswa', {
+      if (!token) {
+        const loginRes = await fetch('/api/auth/mahasiswa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nim: nim.trim() }),
+        })
+        const loginJson = await loginRes.json()
+        if (!loginRes.ok || !loginJson.token) {
+          setError(loginJson.error || 'NIM tidak ditemukan')
+          setLoading(false)
+          return
+        }
+        token = loginJson.token
+      }
+
+      const res = await fetch('/api/absensi', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nim: nim.trim() }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ sessionId: sessionId.trim() }),
       })
-      const loginJson = await loginRes.json()
-      if (!loginRes.ok || !loginJson.token) {
-        setError(loginJson.error || 'NIM tidak ditemukan')
-        setLoading(false)
+      const json = await res.json()
+
+      if (res.status === 401) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('mahasiswa_session')
+        setError('Sesi kamu sudah habis, silakan login ulang...')
+        setTimeout(() => window.location.href = '/login', 2000)
         return
       }
-      token = loginJson.token
+
+      if (!res.ok || !json.success) {
+        setError(json.error || `Error ${res.status}`)
+        return
+      }
+
+      setResult(json.data)
+    } catch {
+      setError('Tidak dapat terhubung ke server')
+    } finally {
+      setLoading(false)
     }
-
-    const res = await fetch('/api/absensi', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ sessionId: sessionId.trim() }),
-    })
-    const json = await res.json()
-
-    if (res.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('mahasiswa_session')
-      setError('Sesi kamu sudah habis, silakan login ulang...')
-      setTimeout(() => window.location.href = '/login', 2000)
-      return
-    }
-
-    if (!res.ok || !json.success) {
-      setError(json.error || `Error ${res.status}`)
-      return
-    }
-
-    setResult(json.data)
-  } catch {
-    setError('Tidak dapat terhubung ke server')
-  } finally {
-    setLoading(false)
   }
-}
+
   if (result) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4"
@@ -117,7 +119,6 @@ export default function AbsenPage() {
     <div className="min-h-screen flex items-center justify-center p-4"
       style={{ background: 'var(--background)' }}>
       <div className="w-full max-w-sm">
-
         <div className="text-center mb-6">
           <p className="text-4xl mb-2">📄</p>
           <h2 className="text-lg font-bold">Tandai Kehadiran</h2>
@@ -129,7 +130,6 @@ export default function AbsenPage() {
         <div className="rounded-2xl p-5 space-y-4"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
 
-          {/* NIM input — hanya kalau belum login */}
           {!isLoggedIn && (
             <div>
               <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--text-muted)' }}>
@@ -149,7 +149,8 @@ export default function AbsenPage() {
           {error && <p className="text-sm text-red-400">❌ {error}</p>}
 
           <button onClick={handleSubmit} {...pressProps}
-          className="w-full py-3 rounded-xl text-sm font-semibold"
+            disabled={loading || (!isLoggedIn && !nim.trim())}
+            className="w-full py-3 rounded-xl text-sm font-semibold"
             style={{
               background: 'var(--accent)',
               color: 'white',
@@ -160,5 +161,18 @@ export default function AbsenPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AbsenPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center"
+        style={{ background: 'var(--background)' }}>
+        <p style={{ color: 'var(--text-muted)' }}>Memuat...</p>
+      </div>
+    }>
+      <AbsenContent />
+    </Suspense>
   )
 }
