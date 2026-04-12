@@ -98,22 +98,30 @@ function AbsenContent() {
   }
 
   if (result) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4"
-        style={{ background: 'var(--background)' }}>
-        <div className="w-full max-w-sm rounded-2xl p-6 text-center"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <p className="text-5xl mb-3">✅</p>
-          <p className="font-bold text-base mb-1" style={{ color: '#22c55e' }}>Absensi Berhasil!</p>
-          <p className="text-sm font-medium mt-3">{result.nama}</p>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{result.mataKuliah}</p>
-          <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-            Pertemuan {result.pertemuan} · {result.tanggal} · {result.waktu}
-          </p>
-        </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: 'var(--background)' }}>
+      <div className="w-full max-w-sm rounded-2xl p-6 text-center"
+        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <p className="text-5xl mb-3">✅</p>
+        <p className="font-bold text-base mb-1" style={{ color: '#22c55e' }}>Absensi Berhasil!</p>
+        <p className="text-sm font-medium mt-3">{result.nama}</p>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{result.mataKuliah}</p>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+          Pertemuan {result.pertemuan} · {result.tanggal} · {result.waktu}
+        </p>
+        {/* Tambah ini */}
+        <button
+          onClick={() => window.location.href = '/login'}
+          {...pressProps}
+          className="mt-5 w-full py-2.5 rounded-xl text-sm font-medium"
+          style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+          Kembali ke Login
+        </button>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
