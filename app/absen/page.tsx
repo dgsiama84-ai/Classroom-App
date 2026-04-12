@@ -116,7 +116,7 @@ function AbsenContent() {
           {...pressProps}
           className="mt-5 w-full py-2.5 rounded-xl text-sm font-medium"
           style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-          Kembali ke Login
+          Kembali
         </button>
       </div>
     </div>
