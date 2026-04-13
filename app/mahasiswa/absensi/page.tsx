@@ -1,9 +1,9 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import jsQR from 'jsqr'
 import { pressProps } from '@/components/pressProps'
-import { CheckCircle2, Camera, Image as ImageIcon } from 'lucide-react'
+import { CheckCircle2, Camera, Image as ImageIcon, Loader2 } from 'lucide-react'
 
 interface AbsensiResult {
   nama: string
@@ -13,7 +13,7 @@ interface AbsensiResult {
   waktu: string
 }
 
-export default function AbsenPage() {
+function AbsensiContent() {
   const searchParams = useSearchParams()
   const galeriRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -25,8 +25,8 @@ export default function AbsenPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [mahasiswa, setMahasiswa] = useState<{ nama: string; nim: string } | null>(null)
   const [loading, setLoading] = useState(false)
-  const [scanning, setScanning] = useState(false) // untuk upload file
-  const [liveScanning, setLiveScanning] = useState(false) // untuk live kamera
+  const [scanning, setScanning] = useState(false)
+  const [liveScanning, setLiveScanning] = useState(false)
   const [result, setResult] = useState<AbsensiResult | null>(null)
   const [error, setError] = useState('')
 
@@ -114,7 +114,7 @@ export default function AbsenPage() {
 
     const reader = new FileReader()
     reader.onload = (e) => {
-      const img = new Image()
+      const img = new window.Image()
       img.onload = () => {
         const MAX = 800
         let w = img.width, h = img.height
@@ -228,7 +228,6 @@ export default function AbsenPage() {
       <div className="rounded-2xl p-4 space-y-4"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
 
-        {/* NIM input — hanya kalau belum login */}
         {!isLoggedIn && (
           <div>
             <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--text-muted)' }}>
@@ -245,7 +244,6 @@ export default function AbsenPage() {
           </div>
         )}
 
-        {/* Live scanner */}
         {liveScanning && (
           <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '1' }}>
             <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
@@ -256,7 +254,6 @@ export default function AbsenPage() {
           </div>
         )}
 
-        {/* 2 tombol card — hanya saat tidak live scan */}
         {!liveScanning && (
           <div className="grid grid-cols-2 gap-3">
             <button onClick={startLiveScan} {...pressProps}
@@ -266,7 +263,7 @@ export default function AbsenPage() {
               <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>Scan Live</span>
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Buka kamera</span>
             </button>
-            <button onClick={() => { if (galeriRef.current) galeriRef.current.click() }}disabled={scanning} {...pressProps}
+            <button onClick={() => { if (galeriRef.current) galeriRef.current.click() }} disabled={scanning} {...pressProps}
               className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
               style={{ background: 'var(--surface2)', border: '2px dashed var(--border)' }}>
               <ImageIcon size={32} style={{ color: 'var(--text-muted)' }} />
@@ -276,7 +273,6 @@ export default function AbsenPage() {
           </div>
         )}
 
-        {/* Batal live scan */}
         {liveScanning && (
           <button onClick={stopCamera} {...pressProps}
             className="w-full py-3 rounded-xl text-sm font-semibold"
@@ -286,10 +282,11 @@ export default function AbsenPage() {
         )}
 
         {scanning && (
-          <p className="text-center text-sm" style={{ color: 'var(--text-muted)' }}>⏳ Membaca QR...</p>
+          <p className="flex items-center justify-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+            <Loader2 size={14} className="animate-spin" /> Membaca QR...
+          </p>
         )}
 
-        {/* Divider + session ID + submit — sembunyikan saat live scan */}
         {!liveScanning && (
           <>
             <div className="flex items-center gap-3">
@@ -307,12 +304,17 @@ export default function AbsenPage() {
                 color: 'var(--text)',
               }} />
 
-            {error && <p className="text-sm text-red-400">❌ {error}</p>}
+            {error && (
+              <p className="text-sm text-red-400">{error}</p>
+            )}
 
             <button onClick={handleSubmit} disabled={loading} {...pressProps}
               className="w-full py-3 rounded-xl text-sm font-semibold"
               style={{ background: 'var(--accent)', color: 'white', opacity: loading ? 0.6 : 1 }}>
-              {loading ? '⏳ Menyimpan...' : '✓ Tandai Hadir'}
+              {loading
+                ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Menyimpan...</span>
+                : '✓ Tandai Hadir'
+              }
             </button>
           </>
         )}
@@ -322,5 +324,17 @@ export default function AbsenPage() {
         className="hidden"
         onChange={e => { if (e.target.files?.[0]) handleScanFile(e.target.files[0]); e.target.value = '' }} />
     </div>
+  )
+}
+
+export default function AbsenPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
+        <Loader2 size={32} className="animate-spin" style={{ color: 'var(--accent)' }} />
+      </div>
+    }>
+      <AbsensiContent />
+    </Suspense>
   )
 }
