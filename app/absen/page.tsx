@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { pressProps } from '@/components/pressProps'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Loader2, UserCheck } from 'lucide-react'
 
 interface AbsensiResult {
   nama: string
@@ -129,7 +129,7 @@ function AbsenContent() {
       style={{ background: 'var(--background)' }}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <p className="text-4xl mb-2">📄</p>
+          <UserCheck size={40} className="mx-auto mb-2" style={{ color: 'var(--accent)' }} />
           <h2 className="text-lg font-bold">Tandai Kehadiran</h2>
           <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
             {isLoggedIn && mahasiswa ? `${mahasiswa.nama} · ${mahasiswa.nim}` : 'Masukkan NIM untuk absen'}
@@ -155,7 +155,7 @@ function AbsenContent() {
             </div>
           )}
 
-          {error && <p className="text-sm text-red-400">❌ {error}</p>}
+          <UserCheck size={40} className="mx-auto mb-2" style={{ color: 'var(--accent)' }} />
 
           <button onClick={handleSubmit} {...pressProps}
             disabled={loading || (!isLoggedIn && !nim.trim())}
@@ -165,7 +165,10 @@ function AbsenContent() {
               color: 'white',
               opacity: loading || (!isLoggedIn && !nim.trim()) ? 0.6 : 1,
             }}>
-            {loading ? '⏳ Menyimpan...' : '✓ Tandai Hadir'}
+           {loading
+  ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Menyimpan...</span>
+  : <span className="flex items-center justify-center gap-1.5"><UserCheck size={16} /> Tandai Hadir</span>
+}
           </button>
         </div>
       </div>
