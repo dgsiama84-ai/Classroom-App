@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 import { formatDate, formatTime } from '@/lib/utils'
 import Select from '@/components/select'
 import { pressProps } from '@/components/pressProps'
-import { QrCode, Timer, Loader2, Download, CheckCircle2, Inbox, BarChart2 } from 'lucide-react'
+import { QrCode, Timer, Loader2, Download, CheckCircle2, Inbox, BarChart2, Lock } from 'lucide-react'
 
 interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
 interface QRSession { id: string; mata_kuliah_id: string; kelas: string; pertemuan: number; expires_at: string }
@@ -331,9 +331,9 @@ export default function AdminAbsensiPage() {
               color: matkulId && kelas && pertemuan ? 'white' : 'var(--text-muted)',
               }}>
                 {loading
-  ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Membuat QR...</span>
-  : <span className="flex items-center justify-center gap-1.5"><QrCode size={16} /> Generate QR</span>
-}
+                ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Membuat QR...</span>
+                : <span className="flex items-center justify-center gap-1.5"><QrCode size={16} /> Generate QR</span>
+                }
             </button>
           </div>
 
@@ -360,13 +360,16 @@ export default function AdminAbsensiPage() {
                     disabled={lockingPertemuan === log.pertemuan}
                     className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all"
                     style={{ background: '#ef444420', color: '#ef4444' }}>
-                      {lockingPertemuan === log.pertemuan ? '...' : '🔒 Lock'}
-                      </button>
+                     {lockingPertemuan === log.pertemuan
+                     ? <Loader2 size={14} className="animate-spin" />
+                     : <span className="flex items-center gap-1"><Lock size={13} /> Kunci</span>
+                     }
+                    </button>
                       ) : (
-                 <span className="text-xs px-3 py-1.5 rounded-lg font-medium"
-                     style={{ background: '#22c55e20', color: '#22c55e' }}>
-                       Terkunci
-                 </span>
+                      <span className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                      style={{ background: '#22c55e20', color: '#22c55e' }}>
+                        <Lock size={13} /> Terkunci
+                        </span>
                     )}
                  </div>
               ))}
@@ -375,7 +378,7 @@ export default function AdminAbsensiPage() {
 
           {qrDataUrl && activeSession && (
              <div className="qr-appear rounded-2xl p-5 text-center"
-    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+             style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <img src={qrDataUrl} alt="QR Code" className="mx-auto rounded-xl mb-4" style={{ width: 220 }} />
               <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl text-xs font-mono"
                 style={{ background: 'var(--background)', border: '1px solid var(--border)' }}>
@@ -414,9 +417,9 @@ export default function AdminAbsensiPage() {
             className="w-full py-2.5 rounded-xl text-sm font-medium"
              style={{ background: 'var(--accent)', color: 'white' }}>
               {importing
-  ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Mengimpor...</span>
-  : <span className="flex items-center justify-center gap-1.5"><Download size={16} /> Import Data Sheets</span>
-}
+              ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Mengimpor...</span>
+              : <span className="flex items-center justify-center gap-1.5"><Download size={16} /> Import Data Sheets</span>
+              }
             </button>
             {importResult && (
               <div className="mt-2 space-y-1">
