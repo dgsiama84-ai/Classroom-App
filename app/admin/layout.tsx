@@ -3,11 +3,12 @@ import { pressProps } from '@/components/pressProps'
 import { getAdminSession, clearSession } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { ClipboardList, BookOpen, GraduationCap } from 'lucide-react'
 
 const navItems = [
-  { href: '/admin/absensi', label: 'Absensi', icon: '📋' },
-  { href: '/admin/tugas', label: 'Tugas', icon: '📝' },
-  { href: '/admin/matkul', label: 'Mata Kuliah', icon: '📚' },
+  { href: '/admin/absensi', label: 'Absensi', icon: <ClipboardList size={20} /> },
+  { href: '/admin/tugas', label: 'Tugas', icon: <BookOpen size={20} /> },
+  { href: '/admin/matkul', label: 'Mata Kuliah', icon: <GraduationCap size={20} /> },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -1,5 +1,5 @@
 'use client'
-
+import { Bot } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { getMahasiswaSession } from '@/lib/auth'
 import { pressProps } from '@/components/pressProps'
@@ -107,10 +107,10 @@ export default function AIPage() {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && mounted && (
           <div className="flex flex-col items-center justify-center h-full text-center gap-3">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-              🤖
-            </div>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+  style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+  <Bot size={28} style={{ color: 'var(--accent)' }} />
+</div>
             <div>
               <p className="font-medium">{firstName ? `Halo, ${firstName}!` : 'Halo!'}</p>
               <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
@@ -132,10 +132,10 @@ export default function AIPage() {
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} fade-in`}>
             {msg.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5"
-                style={{ background: 'var(--accent)', color: 'white' }}>
-                🤖
-              </div>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mr-2 mt-0.5"
+  style={{ background: 'var(--accent)' }}>
+  <Bot size={14} color="white" />
+</div>
             )}
             <div className="max-w-[80%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap"
               style={{
@@ -152,8 +152,10 @@ export default function AIPage() {
 
         {loading && (
           <div className="flex justify-start fade-in">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 mr-2"
-              style={{ background: 'var(--accent)' }}>🤖</div>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mr-2"
+  style={{ background: 'var(--accent)' }}>
+  <Bot size={14} color="white" />
+</div>
             <div className="rounded-2xl rounded-bl-sm px-4 py-3"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <div className="flex gap-1">

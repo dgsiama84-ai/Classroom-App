@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import { getAdminSession } from '@/lib/auth'
 import { useEffect, useState } from 'react'
-import Select from '@/components/select'
+import { BookOpen, User } from 'lucide-react'
 import Spinner from '@/components/Spinner'
 
 interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
@@ -72,7 +72,7 @@ useEffect(() => {
         <Spinner />
       ) : list.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-4xl mb-3">📚</p>
+          <BookOpen size={40} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)' }}>Belum ada mata kuliah</p>
           <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Tambah mata kuliah dulu</p>
         </div>
@@ -84,7 +84,9 @@ useEffect(() => {
             <p className="text-sm font-medium">{mk.nama}</p>
             <p className="text-xs mt-0.5" style={{ color: 'var(--accent-light)' }}>{mk.kode}</p>
             {mk.dosen && (
-              <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>👤 {mk.dosen}</p>
+              <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+             <User size={25} /> {mk.dosen}
+             </p>
               )}
               </div>
           ))}

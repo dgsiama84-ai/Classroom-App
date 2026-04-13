@@ -2,14 +2,14 @@
 import { pressProps } from '@/components/pressProps'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import Link from 'next/link'
 import { getMahasiswaSession, clearSession } from '@/lib/auth'
+import { ClipboardList, BookOpen, History, Bot, GraduationCap } from 'lucide-react'
 
 const navItems = [
-  { href: '/mahasiswa/absensi', label: 'Absensi', icon: '📋' },
-  { href: '/mahasiswa/tugas', label: 'Tugas', icon: '📚' },
-  { href: '/mahasiswa/riwayat', label: 'Riwayat', icon: '📊' },
-  { href: '/mahasiswa/ai', label: 'Asisten', icon: '🤖' },
+  { href: '/mahasiswa/absensi', label: 'Absensi', icon: <ClipboardList size={20} /> },
+  { href: '/mahasiswa/tugas', label: 'Tugas', icon: <BookOpen size={20} /> },
+  { href: '/mahasiswa/riwayat', label: 'Riwayat', icon: <History size={20} /> },
+  { href: '/mahasiswa/ai', label: 'Asisten', icon: <Bot size={20} /> },
 ]
 
 export default function MahasiswaLayout({ children }: { children: React.ReactNode }) {
@@ -37,7 +37,7 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
       <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3"
         style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center gap-2">
-          <span className="text-lg">🎓</span>
+          <GraduationCap size={20} />
           <span className="font-bold text-sm">25MA 2</span>
         </div>
         <div className="flex items-center gap-3">

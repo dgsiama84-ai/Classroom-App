@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 import { formatDate, formatTime } from '@/lib/utils'
 import Select from '@/components/select'
 import { pressProps } from '@/components/pressProps'
-
+import { QrCode, Timer, Loader2, Download, CheckCircle2, Inbox, BarChart2 } from 'lucide-react'
 
 interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
 interface QRSession { id: string; mata_kuliah_id: string; kelas: string; pertemuan: number; expires_at: string }
@@ -248,7 +248,7 @@ export default function AdminAbsensiPage() {
     return {
       value: String(num),
       label: isLocked
-        ? `Pertemuan ${num} 🔒`
+        ? `Pertemuan ${num} (Terkunci)`
         : log
           ? `Pertemuan ${num} (${log.jumlah_absensi} absensi)`
           : `Pertemuan ${num}`,
@@ -268,7 +268,10 @@ export default function AdminAbsensiPage() {
               background: tab === t ? 'var(--accent)' : 'transparent',
               color: tab === t ? 'white' : 'var(--text-muted)',
             }}>
-            {t === 'generate' ? '📲 Generate QR' : '📊 Rekap'}
+            {t === 'generate'
+  ? <span className="flex items-center justify-center gap-1.5"><QrCode size={14} /> Generate QR</span>
+  : <span className="flex items-center justify-center gap-1.5"><BarChart2 size={14} /> Rekap</span>
+}
           </button>
         ))}
       </div>
@@ -327,7 +330,10 @@ export default function AdminAbsensiPage() {
               background: matkulId && kelas && pertemuan ? 'var(--accent)' : 'var(--surface2)',
               color: matkulId && kelas && pertemuan ? 'white' : 'var(--text-muted)',
               }}>
-                {loading ? '⏳ Membuat QR...' : '📲 Generate QR'}
+                {loading
+  ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Membuat QR...</span>
+  : <span className="flex items-center justify-center gap-1.5"><QrCode size={16} /> Generate QR</span>
+}
             </button>
           </div>
 
@@ -359,7 +365,7 @@ export default function AdminAbsensiPage() {
                       ) : (
                  <span className="text-xs px-3 py-1.5 rounded-lg font-medium"
                      style={{ background: '#22c55e20', color: '#22c55e' }}>
-                        🔒 Terkunci
+                       Terkunci
                  </span>
                     )}
                  </div>
@@ -385,7 +391,7 @@ export default function AdminAbsensiPage() {
               <div className="flex justify-center mb-3">
                 <span className={`text-2xl font-bold tabular-nums font-mono px-4 py-1.5 rounded-xl ${timeLeft < 60 ? 'text-red-400' : 'text-green-400'}`}
                   style={{ background: timeLeft < 60 ? '#ef444415' : '#22c55e15' }}>
-                  ⏱ {formatCountdown(timeLeft)}
+                  <span className="flex items-center justify-center gap-1.5"><Timer size={18} />{formatCountdown(timeLeft)}</span>
                 </span>
               </div>
               <p className="text-sm font-medium">
@@ -407,12 +413,15 @@ export default function AdminAbsensiPage() {
             <button onClick={importFromSheets} disabled={importing} {...pressProps}
             className="w-full py-2.5 rounded-xl text-sm font-medium"
              style={{ background: 'var(--accent)', color: 'white' }}>
-              {importing ? '⏳ Mengimpor...' : '📥 Import Data Sheets'}
+              {importing
+  ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Mengimpor...</span>
+  : <span className="flex items-center justify-center gap-1.5"><Download size={16} /> Import Data Sheets</span>
+}
             </button>
             {importResult && (
               <div className="mt-2 space-y-1">
                 <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-                  ✅ {importResult.inserted} diimport · {importResult.skipped} dilewati
+                  <span className="flex items-center justify-center gap-1.5"><CheckCircle2 size={13} style={{ color: '#22c55e' }} />{importResult.inserted} diimport · {importResult.skipped} dilewati</span>
                 </p>
                 {importResult.mapped.map(m => (
                   <p key={m.tab} className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -488,7 +497,7 @@ export default function AdminAbsensiPage() {
             </div>
           ) : absensiList.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-4xl mb-3">📭</p>
+              <Inbox size={40} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
               <p style={{ color: 'var(--text-muted)' }}>Belum ada data absensi</p>
             </div>
           ) : (

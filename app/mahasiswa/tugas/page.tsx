@@ -2,6 +2,7 @@
 import Spinner from '@/components/Spinner'
 import { useEffect, useState } from 'react'
 import { formatDateTime } from '@/lib/utils'
+import { Inbox } from 'lucide-react'
 
 interface Tugas {
   id: string
@@ -84,7 +85,7 @@ export default function TugasPage() {
 
       {data.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-4xl mb-3">📭</p>
+          <Inbox size={40} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)' }}>Belum ada tugas</p>
         </div>
       ) : (

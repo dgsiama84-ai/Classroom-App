@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { pressProps } from '@/components/pressProps'
+import { CheckCircle2 } from 'lucide-react'
 
 interface AbsensiResult {
   nama: string
@@ -103,7 +104,7 @@ function AbsenContent() {
       style={{ background: 'var(--background)' }}>
       <div className="w-full max-w-sm rounded-2xl p-6 text-center"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <p className="text-5xl mb-3">✅</p>
+        <CheckCircle2 size={48} className="mx-auto mb-3" style={{ color: '#22c55e' }} />
         <p className="font-bold text-base mb-1" style={{ color: '#22c55e' }}>Absensi Berhasil!</p>
         <p className="text-sm font-medium mt-3">{result.nama}</p>
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{result.mataKuliah}</p>

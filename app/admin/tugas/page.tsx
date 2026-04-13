@@ -1,5 +1,5 @@
 'use client'
-
+import { FileText } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { formatDateTime } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -161,7 +161,7 @@ useEffect(() => {
         <Spinner />
       ) : list.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-4xl mb-3">📝</p>
+          <FileText size={40} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)' }}>Belum ada tugas</p>
         </div>
       ) : (

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import jsQR from 'jsqr'
 import { pressProps } from '@/components/pressProps'
+import { CheckCircle2, Camera, Image as ImageIcon } from 'lucide-react'
 
 interface AbsensiResult {
   nama: string
@@ -198,7 +199,7 @@ export default function AbsenPage() {
         style={{ background: 'var(--background)' }}>
         <div className="w-full max-w-sm rounded-2xl p-6 text-center"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <p className="text-5xl mb-3">✅</p>
+          <CheckCircle2 size={48} className="mx-auto mb-3" style={{ color: '#22c55e' }} />
           <p className="font-bold text-base mb-1" style={{ color: '#22c55e' }}>Absensi Berhasil!</p>
           <p className="text-sm font-medium mt-3">{result.nama}</p>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{result.mataKuliah}</p>
@@ -261,14 +262,14 @@ export default function AbsenPage() {
             <button onClick={startLiveScan} {...pressProps}
               className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
               style={{ background: 'var(--surface2)', border: '2px dashed var(--border)' }}>
-              <span className="text-3xl">📷</span>
+              <Camera size={32} style={{ color: 'var(--text-muted)' }} />
               <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>Scan Live</span>
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Buka kamera</span>
             </button>
-            <button onClick={() => galeriRef.current?.click()} disabled={scanning} {...pressProps}
+            <button onClick={() => { if (galeriRef.current) galeriRef.current.click() }}disabled={scanning} {...pressProps}
               className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
               style={{ background: 'var(--surface2)', border: '2px dashed var(--border)' }}>
-              <span className="text-3xl">🖼️</span>
+              <ImageIcon size={32} style={{ color: 'var(--text-muted)' }} />
               <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>Upload QR</span>
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Pilih dari galeri</span>
             </button>
