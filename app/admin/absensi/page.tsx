@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 import { formatDate, formatTime } from '@/lib/utils'
 import Select from '@/components/select'
 import { pressProps } from '@/components/pressProps'
-import { QrCode, Timer, Loader2, Download, CheckCircle2, Inbox, BarChart2, Lock } from 'lucide-react'
+import { QrCode, Timer, Loader2, Download, CheckCircle2, Inbox, BarChart2, Lock, AlertTriangle } from 'lucide-react'
 
 interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
 interface QRSession { id: string; mata_kuliah_id: string; kelas: string; pertemuan: number; expires_at: string }
@@ -30,10 +30,11 @@ export default function AdminAbsensiPage() {
   const router = useRouter()
 
   useEffect(() => {
-  const session = getAdminSession()
-  if (!session) router.replace('/login')
-  else setAdminNama(session.nama || session.username)
-}, [router])
+    const session = getAdminSession()
+    if (!session) router.replace('/login')
+    else setAdminNama(session.nama || session.username)
+  }, [router])
+
   const [matkulList, setMatkulList] = useState<MataKuliah[]>([])
   const [activeSession, setActiveSession] = useState<QRSession | null>(null)
   const [qrDataUrl, setQrDataUrl] = useState('')
@@ -53,6 +54,10 @@ export default function AdminAbsensiPage() {
     mapped: { tab: string; matchedTo: string }[]
     unmapped: string[]
   } | null>(null)
+
+  // Modal konfirmasi lock
+  const [confirmLock, setConfirmLock] = useState<number | null>(null)
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const activeSessionRef = useRef<QRSession | null>(null)
 
@@ -101,7 +106,6 @@ export default function AdminAbsensiPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [activeSession])
 
-  // Load pertemuan logs saat matkul + kelas dipilih
   useEffect(() => {
     if (matkulId && kelas) loadPertemuanLogs()
     else setPertemuanLogs([])
@@ -144,7 +148,6 @@ export default function AdminAbsensiPage() {
     setLockingPertemuan(null)
     loadPertemuanLogs()
 
-    // Kalau pertemuan yang di-lock adalah yang aktif, hapus QR
     if (lock && activeSession?.pertemuan === p) {
       setActiveSession(null)
       setQrDataUrl('')
@@ -239,8 +242,6 @@ export default function AdminAbsensiPage() {
     return { text: 'text-gray-400', bg: '#ffffff10', label: '— Belum' }
   }
 
-  // Pertemuan yang sudah locked tidak bisa dipilih
-  const lockedPertemuan = pertemuanLogs.filter(p => p.is_locked).map(p => p.pertemuan)
   const pertemuanOptions = Array.from({ length: 16 }, (_, i) => {
     const num = i + 1
     const log = pertemuanLogs.find(p => p.pertemuan === num)
@@ -256,8 +257,56 @@ export default function AdminAbsensiPage() {
     }
   })
 
+  const confirmLog = confirmLock !== null ? pertemuanLogs.find(p => p.pertemuan === confirmLock) : null
+
   return (
     <div className="p-4">
+
+      {/* Modal Konfirmasi Lock */}
+      {confirmLock !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overlay-enter"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-full max-w-xs rounded-2xl p-5 modal enter"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            <div className="flex flex-col items-center text-center mb-4">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
+                style={{ background: '#ef444420' }}>
+                <AlertTriangle size={24} style={{ color: '#ef4444' }} />
+              </div>
+              <p className="font-bold text-base">Kunci Pertemuan {confirmLock}?</p>
+              <p className="text-sm mt-1.5" style={{ color: 'var(--text-muted)' }}>
+                Pertemuan ini akan dikunci. QR absensi tidak bisa digunakan lagi dan data tidak bisa diubah.
+              </p>
+              {confirmLog && (
+                <p className="text-xs mt-2 px-3 py-1.5 rounded-lg"
+                  style={{ background: 'var(--surface2)', color: 'var(--text-muted)' }}>
+                  {confirmLog.jumlah_absensi} mahasiswa sudah absen
+                </p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmLock(null)}
+                {...pressProps}
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium"
+                style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  handleLock(confirmLock, true)
+                  setConfirmLock(null)
+                }}
+                {...pressProps}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5"
+                style={{ background: '#ef4444', color: 'white' }}>
+                <Lock size={14} /> Kunci
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h2 className="text-lg font-bold mb-1">Absensi</h2>
       <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>{adminNama}</p>
       <div className="flex rounded-xl p-1 mb-5" style={{ background: 'var(--surface)' }}>
@@ -269,9 +318,9 @@ export default function AdminAbsensiPage() {
               color: tab === t ? 'white' : 'var(--text-muted)',
             }}>
             {t === 'generate'
-  ? <span className="flex items-center justify-center gap-1.5"><QrCode size={14} /> Generate QR</span>
-  : <span className="flex items-center justify-center gap-1.5"><BarChart2 size={14} /> Rekap</span>
-}
+              ? <span className="flex items-center justify-center gap-1.5"><QrCode size={14} /> Generate QR</span>
+              : <span className="flex items-center justify-center gap-1.5"><BarChart2 size={14} /> Rekap</span>
+            }
           </button>
         ))}
       </div>
@@ -321,23 +370,21 @@ export default function AdminAbsensiPage() {
                 ))}
               </div>
             </div>
-            {/* Tombol generate */}
             <button
-             onClick={generateQR} {...pressProps}
-             disabled={!matkulId || !kelas || !pertemuan || loading}
-             className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${loading ? 'btn-pulse' : ''}`}
-             style={{
-              background: matkulId && kelas && pertemuan ? 'var(--accent)' : 'var(--surface2)',
-              color: matkulId && kelas && pertemuan ? 'white' : 'var(--text-muted)',
+              onClick={generateQR} {...pressProps}
+              disabled={!matkulId || !kelas || !pertemuan || loading}
+              className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${loading ? 'btn-pulse' : ''}`}
+              style={{
+                background: matkulId && kelas && pertemuan ? 'var(--accent)' : 'var(--surface2)',
+                color: matkulId && kelas && pertemuan ? 'white' : 'var(--text-muted)',
               }}>
-                {loading
+              {loading
                 ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Membuat QR...</span>
                 : <span className="flex items-center justify-center gap-1.5"><QrCode size={16} /> Generate QR</span>
-                }
+              }
             </button>
           </div>
 
-          {/* List pertemuan + lock */}
           {matkulId && kelas && pertemuanLogs.length > 0 && (
             <div className="rounded-2xl p-4 space-y-2"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
@@ -356,29 +403,30 @@ export default function AdminAbsensiPage() {
                   </div>
                   {!log.is_locked ? (
                     <button
-                    onClick={() => handleLock(log.pertemuan, true)} {...pressProps}
-                    disabled={lockingPertemuan === log.pertemuan}
-                    className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all"
-                    style={{ background: '#ef444420', color: '#ef4444' }}>
-                     {lockingPertemuan === log.pertemuan
-                     ? <Loader2 size={14} className="animate-spin" />
-                     : <span className="flex items-center gap-1"><Lock size={13} /> Kunci</span>
-                     }
+                      onClick={() => setConfirmLock(log.pertemuan)}
+                      {...pressProps}
+                      disabled={lockingPertemuan === log.pertemuan}
+                      className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all"
+                      style={{ background: '#ef444420', color: '#ef4444' }}>
+                      {lockingPertemuan === log.pertemuan
+                        ? <Loader2 size={14} className="animate-spin" />
+                        : <span className="flex items-center gap-1"><Lock size={13} /> Kunci</span>
+                      }
                     </button>
-                      ) : (
-                      <span className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                  ) : (
+                    <span className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
                       style={{ background: '#22c55e20', color: '#22c55e' }}>
-                        <Lock size={13} /> Terkunci
-                        </span>
-                    )}
-                 </div>
+                      <Lock size={13} /> Terkunci
+                    </span>
+                  )}
+                </div>
               ))}
             </div>
           )}
 
           {qrDataUrl && activeSession && (
-             <div className="qr-appear rounded-2xl p-5 text-center"
-             style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            <div className="qr-appear rounded-2xl p-5 text-center"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <img src={qrDataUrl} alt="QR Code" className="mx-auto rounded-xl mb-4" style={{ width: 220 }} />
               <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl text-xs font-mono"
                 style={{ background: 'var(--background)', border: '1px solid var(--border)' }}>
@@ -414,17 +462,20 @@ export default function AdminAbsensiPage() {
               Sync dari Google Sheets
             </p>
             <button onClick={importFromSheets} disabled={importing} {...pressProps}
-            className="w-full py-2.5 rounded-xl text-sm font-medium"
-             style={{ background: 'var(--accent)', color: 'white' }}>
+              className="w-full py-2.5 rounded-xl text-sm font-medium"
+              style={{ background: 'var(--accent)', color: 'white' }}>
               {importing
-              ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Mengimpor...</span>
-              : <span className="flex items-center justify-center gap-1.5"><Download size={16} /> Import Data Sheets</span>
+                ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Mengimpor...</span>
+                : <span className="flex items-center justify-center gap-1.5"><Download size={16} /> Import Data Sheets</span>
               }
             </button>
             {importResult && (
               <div className="mt-2 space-y-1">
                 <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-                  <span className="flex items-center justify-center gap-1.5"><CheckCircle2 size={13} style={{ color: '#22c55e' }} />{importResult.inserted} diimport · {importResult.skipped} dilewati</span>
+                  <span className="flex items-center justify-center gap-1.5">
+                    <CheckCircle2 size={13} style={{ color: '#22c55e' }} />
+                    {importResult.inserted} diimport · {importResult.skipped} dilewati
+                  </span>
                 </p>
                 {importResult.mapped.map(m => (
                   <p key={m.tab} className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -453,13 +504,13 @@ export default function AdminAbsensiPage() {
                     value: String(i + 1), label: `Pertemuan ${i + 1}`
                   }))} />
               </div>
-           </div>
-             <button onClick={loadRekap} {...pressProps}
-             className="w-full py-2.5 rounded-xl text-sm font-medium"
-               style={{ background: 'var(--accent)', color: 'white' }}>
-                Tampilkan
-              </button>
-           </div>
+            </div>
+            <button onClick={loadRekap} {...pressProps}
+              className="w-full py-2.5 rounded-xl text-sm font-medium"
+              style={{ background: 'var(--accent)', color: 'white' }}>
+              Tampilkan
+            </button>
+          </div>
 
           {rekapPertemuan.length > 0 ? (
             <div>
