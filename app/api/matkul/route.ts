@@ -1,18 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { ACTIVE_SEMESTER } from '@/lib/config'
 
-export async function GET() {
-  const { data, error } = await supabaseAdmin
-    .from('mata_kuliah')
-    .select('*')
-    .order('kode')
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const showAll = searchParams.get('all') === 'true'
+
+  let query = supabaseAdmin.from('mata_kuliah').select('*').order('kode')
+  if (!showAll) query = query.eq('semester', ACTIVE_SEMESTER)
+
+  const { data, error } = await query
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
   return Response.json({ data })
 }
 
 export async function POST(req: NextRequest) {
-  const { kode, nama } = await req.json()
+  const { kode, nama, dosen, semester } = await req.json()
 
   if (!kode || !nama) {
     return NextResponse.json({ error: 'Kode dan nama wajib diisi' }, { status: 400 })
@@ -20,7 +24,12 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from('mata_kuliah')
-    .insert({ kode: kode.trim().toUpperCase(), nama: nama.trim() })
+    .insert({
+      kode: kode.trim().toUpperCase(),
+      nama: nama.trim(),
+      dosen: dosen?.trim() || null,
+      semester: semester?.trim() || ACTIVE_SEMESTER,
+    })
     .select()
     .single()
 

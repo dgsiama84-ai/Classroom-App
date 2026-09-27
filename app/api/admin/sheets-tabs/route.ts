@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { google } from 'googleapis'
+import { ACTIVE_SEMESTER } from '@/lib/config'
 
 async function getSheets() {
   const auth = new google.auth.GoogleAuth({
@@ -29,6 +30,7 @@ export async function GET() {
     const { data: matkulList } = await supabaseAdmin
       .from('mata_kuliah')
       .select('id, kode, nama')
+      .eq('semester', ACTIVE_SEMESTER)
 
     return NextResponse.json({ success: true, tabs, matkulList })
   } catch (err) {

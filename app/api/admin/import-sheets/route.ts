@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { google } from 'googleapis'
+import { ACTIVE_SEMESTER } from '@/lib/config'
 
 async function getSheets() {
   const auth = new google.auth.GoogleAuth({
@@ -62,6 +63,7 @@ async function runSync() {
   const { data: matkulList, error: matkulError } = await supabaseAdmin
     .from('mata_kuliah')
     .select('id, kode, nama')
+    .eq('semester', ACTIVE_SEMESTER)
 
   if (matkulError || !matkulList) {
     throw new Error('Gagal ambil data matkul')

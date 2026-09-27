@@ -8,7 +8,7 @@ import Select from '@/components/select'
 import { pressProps } from '@/components/pressProps'
 import { QrCode, Timer, Loader2, Download, CheckCircle2, Inbox, BarChart2, Lock, AlertTriangle } from 'lucide-react'
 
-interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
+interface MataKuliah { id: string; kode: string; nama: string; dosen?: string; semester?: string }
 interface QRSession { id: string; mata_kuliah_id: string; kelas: string; pertemuan: number; expires_at: string }
 interface AbsensiRecord {
   id: string; nim: string; nama: string; kelas: string
@@ -36,6 +36,7 @@ export default function AdminAbsensiPage() {
   }, [router])
 
   const [matkulList, setMatkulList] = useState<MataKuliah[]>([])
+  const [allMatkulList, setAllMatkulList] = useState<MataKuliah[]>([])
   const [activeSession, setActiveSession] = useState<QRSession | null>(null)
   const [qrDataUrl, setQrDataUrl] = useState('')
   const [absensiList, setAbsensiList] = useState<AbsensiRecord[]>([])
@@ -71,6 +72,7 @@ export default function AdminAbsensiPage() {
 
   useEffect(() => {
     fetch('/api/matkul').then(r => r.json()).then(j => setMatkulList(j.data || []))
+    fetch('/api/matkul?all=true').then(r => r.json()).then(j => setAllMatkulList(j.data || []))
   }, [])
 
   useEffect(() => {
@@ -495,7 +497,7 @@ export default function AdminAbsensiPage() {
               <div>
                 <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--text-muted)' }}>Mata Kuliah</label>
                 <Select value={rekapMatkul} onChange={setRekapMatkul} placeholder="Semua"
-                  options={matkulList.map(mk => ({ value: mk.id, label: mk.kode }))} />
+                  options={allMatkulList.map(mk => ({ value: mk.id, label: `${mk.kode} — ${mk.nama}${mk.semester ? ` (${mk.semester})` : ''}` }))} />
               </div>
               <div>
                 <label className="text-xs font-medium block mb-1.5" style={{ color: 'var(--text-muted)' }}>Pertemuan</label>
