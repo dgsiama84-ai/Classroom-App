@@ -29,7 +29,6 @@ export default function RiwayatPage() {
   const [filter, setFilter] = useState('semua')
 
   const matkulList = [...new Map(data.map(d => [d.mata_kuliah_id, d.mata_kuliah])).entries()]
-  .sort((a, b) => a[1].kode.localeCompare(b[1].kode))
   useEffect(() => {
     if (!session) return
     const token = localStorage.getItem('token')
@@ -38,11 +37,12 @@ export default function RiwayatPage() {
     })
       .then(r => r.json())
       .then(json => {
-        // Urutkan per matkul lalu per pertemuan
+        // Terbaru dulu (tanggal & jam), biar matkul semester ini nongol di atas,
+        // bukan matkul lama cuma karena id-nya lebih kecil secara string.
         const sorted = (json.data || []).sort((a: AbsensiRecord, b: AbsensiRecord) => {
-          if (a.mata_kuliah_id !== b.mata_kuliah_id)
-            return a.mata_kuliah_id.localeCompare(b.mata_kuliah_id)
-          return a.pertemuan - b.pertemuan
+          const dateCompare = b.tanggal.localeCompare(a.tanggal)
+          if (dateCompare !== 0) return dateCompare
+          return b.waktu.localeCompare(a.waktu)
         })
         setData(sorted)
         setLoading(false)
@@ -76,13 +76,13 @@ export default function RiwayatPage() {
         </button>
         {matkulList.map(([id, mk]) => (
           <button key={id} onClick={() => setFilter(id)} {...pressProps}
-            className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium"
+            className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
             style={{
               background: filter === id ? 'var(--accent)' : 'var(--surface)',
               color: filter === id ? 'white' : 'var(--text-muted)',
               border: '1px solid var(--border)'
             }}>
-            {mk.kode}
+            {mk.nama.length > 20 ? mk.nama.slice(0, 18) + '…' : mk.nama}
           </button>
         ))}
       </div>
