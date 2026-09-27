@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { getMahasiswaSession } from '@/lib/auth'
 import Spinner from '@/components/Spinner'
 import { pressProps } from '@/components/pressProps'
+import { ACTIVE_SEMESTER } from '@/lib/config'
 
 interface AbsensiRecord {
   id: string
@@ -12,7 +13,7 @@ interface AbsensiRecord {
   tanggal: string
   waktu: string
   status: 'hadir' | 'sakit' | 'izin' | 'alpa'
-  mata_kuliah: { kode: string; nama: string }
+  mata_kuliah: { kode: string; nama: string; semester?: string }
 }
 
 const statusConfig = {
@@ -27,8 +28,8 @@ export default function RiwayatPage() {
   const [data, setData] = useState<AbsensiRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('semua')
+  const [showLama, setShowLama] = useState(false)
 
-  const matkulList = [...new Map(data.map(d => [d.mata_kuliah_id, d.mata_kuliah])).entries()]
   useEffect(() => {
     if (!session) return
     const token = localStorage.getItem('token')
@@ -49,19 +50,36 @@ export default function RiwayatPage() {
       })
   }, [session?.nim])
 
-  const filtered = filter === 'semua' ? data : data.filter(d => d.mata_kuliah_id === filter)
+  // Pisah semester aktif vs semester lalu, biar nggak campur kayak sebelumnya
+  const scoped = data.filter(d =>
+    showLama ? d.mata_kuliah?.semester !== ACTIVE_SEMESTER : d.mata_kuliah?.semester === ACTIVE_SEMESTER
+  )
+  const matkulList = [...new Map(scoped.map(d => [d.mata_kuliah_id, d.mata_kuliah])).entries()]
+
+  const filtered = filter === 'semua' ? scoped : scoped.filter(d => d.mata_kuliah_id === filter)
 
   // Hitung persentase hadir per matkul yang difilter
   const persen = filtered.length === 0 ? 0 :
     Math.round(filtered.filter(d => d.status === 'hadir').length / filtered.length * 100)
 
+  function toggleSemester() {
+    setShowLama(v => !v)
+    setFilter('semua')
+  }
+
   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-1">Riwayat Absensi</h2>
-      <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
-        {filtered.length} pertemuan
+      <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+        {filtered.length} pertemuan {showLama ? '(semester lalu)' : '(semester ini)'}
         {filter !== 'semua' && ` · ${persen}% hadir`}
       </p>
+
+      <button onClick={toggleSemester} {...pressProps}
+        className="text-xs font-medium mb-4 px-3 py-1.5 rounded-lg"
+        style={{ background: 'var(--surface2)', color: 'var(--accent-light)', border: '1px solid var(--border)' }}>
+        {showLama ? 'Kembali ke semester ini' : 'Lihat semester lalu'}
+      </button>
 
       {/* Filter matkul */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar">
