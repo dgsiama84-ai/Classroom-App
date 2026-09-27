@@ -14,24 +14,36 @@ async function getSheets() {
   return google.sheets({ version: 'v4', auth })
 }
 
+const STOPWORDS = new Set(['dan', 'di', 'ke', 'dari', 'untuk', 'dengan', 'atau', 'yang', 'pada', 'serta', 'ii', 'iii'])
+
+function significantWords(s: string): string[] {
+  return s.toLowerCase().trim().split(/\s+/).filter(w => w && !STOPWORDS.has(w))
+}
+
 function findBestMatch(tabName: string, matkulList: { id: string; nama: string; kode: string }[]) {
-  const tab = tabName.toLowerCase()
-  const exact = matkulList.find(m => m.nama.toLowerCase() === tab)
+  const tab = tabName.toLowerCase().trim()
+  const exact = matkulList.find(m => m.nama.toLowerCase().trim() === tab)
   if (exact) return exact
-  const contains = matkulList.find(m =>
-    tab.includes(m.nama.toLowerCase()) || m.nama.toLowerCase().includes(tab)
-  )
+
+  const contains = matkulList.find(m => {
+    const nama = m.nama.toLowerCase().trim()
+    return tab.includes(nama) || nama.includes(tab)
+  })
   if (contains) return contains
-  const tabWords = tab.split(/\s+/)
+
+  // Fuzzy fallback: kata umum ("dan", "bisnis", dst) diabaikan biar nggak nyangkut ke matkul
+  // yang nggak berhubungan sama sekali. Butuh minimal 2 kata inti yang sama + skor tinggi.
+  const tabWords = significantWords(tab)
   let bestScore = 0
-  let bestMatch = null
+  let bestMatch: { id: string; nama: string; kode: string } | null = null
   for (const matkul of matkulList) {
-    const matkulWords = matkul.nama.toLowerCase().split(/\s+/)
+    const matkulWords = significantWords(matkul.nama)
     const overlap = tabWords.filter(w => matkulWords.includes(w)).length
+    if (overlap < 2) continue
     const score = overlap / Math.max(tabWords.length, matkulWords.length)
     if (score > bestScore) { bestScore = score; bestMatch = matkul }
   }
-  return bestScore >= 0.4 ? bestMatch : null
+  return bestScore >= 0.6 ? bestMatch : null
 }
 
 function parseStatus(nilai: string): string | null {
