@@ -178,7 +178,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from('absensi')
-      .select('*, mata_kuliah:mata_kuliah_id(kode, nama)')
+      .select('*, mata_kuliah:mata_kuliah_id(kode, nama, semester)')
       .eq('nim', mahasiswa.nim)
       .order('tanggal', { ascending: false })
 
