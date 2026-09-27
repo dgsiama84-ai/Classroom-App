@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { jwtVerify } from 'jose'
 import { appendToSheet } from '@/lib/sheets'
+import { nowInMakassar } from '@/lib/utils'
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!)
 
@@ -46,9 +47,7 @@ export async function POST(req: NextRequest) {
         )
       }
 
-      const now = new Date()
-      const tanggal = now.toISOString().split('T')[0]
-      const waktu = now.toTimeString().split(' ')[0]
+      const { tanggal, waktu } = nowInMakassar()
 
       const { error: insertError } = await supabaseAdmin
         .from('absensi')
@@ -107,9 +106,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Kamu sudah absen di pertemuan ini' }, { status: 409 })
       }
 
-      const now = new Date()
-      const tanggal = now.toISOString().split('T')[0]
-      const waktu = now.toTimeString().slice(0, 8)
+      const { tanggal, waktu } = nowInMakassar()
 
       const { data, error } = await supabaseAdmin
         .from('absensi')
