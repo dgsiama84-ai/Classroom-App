@@ -3,14 +3,15 @@ import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { pressProps } from '@/components/pressProps'
-import { CheckCircle2, Loader2, UserCheck } from 'lucide-react'
+import { CheckCircle2, Loader2, UserCheck, AlertCircle } from 'lucide-react'
 
 interface AbsensiResult {
   nama: string
   mataKuliah: string
   pertemuan: number
-  tanggal: string
-  waktu: string
+  tanggal: string | null
+  waktu: string | null
+  status?: string
 }
 
 function AbsenContent() {
@@ -22,6 +23,7 @@ function AbsenContent() {
   const [mahasiswa, setMahasiswa] = useState<{ nama: string; nim: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<AbsensiResult | null>(null)
+  const [alreadyAbsent, setAlreadyAbsent] = useState<AbsensiResult | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -85,6 +87,11 @@ function AbsenContent() {
         return
       }
 
+      if (res.status === 409 && json.alreadyAbsent) {
+        setAlreadyAbsent(json.data)
+        return
+      }
+
       if (!res.ok || !json.success) {
         setError(json.error || `Error ${res.status}`)
         return
@@ -96,6 +103,36 @@ function AbsenContent() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (alreadyAbsent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4"
+        style={{ background: 'var(--background)' }}>
+        <div className="w-full max-w-sm rounded-2xl p-6 text-center"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <AlertCircle size={48} className="mx-auto mb-3" style={{ color: '#eab308' }} />
+          <p className="font-bold text-base mb-1" style={{ color: '#eab308' }}>Kamu Sudah Absen</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            Kehadiranmu di pertemuan ini sudah tercatat, nggak perlu absen lagi.
+          </p>
+          <p className="text-sm font-medium mt-4">{alreadyAbsent.nama}</p>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{alreadyAbsent.mataKuliah}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+            Pertemuan {alreadyAbsent.pertemuan}
+            {alreadyAbsent.tanggal && ` · ${alreadyAbsent.tanggal}`}
+            {alreadyAbsent.waktu && ` · ${alreadyAbsent.waktu}`}
+          </p>
+          <button
+            onClick={() => window.location.href = '/login'}
+            {...pressProps}
+            className="mt-5 w-full py-2.5 rounded-xl text-sm font-medium"
+            style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+            Kembali
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (result) {
@@ -155,7 +192,12 @@ function AbsenContent() {
             </div>
           )}
 
-          <UserCheck size={40} className="mx-auto mb-2" style={{ color: 'var(--accent)' }} />
+          {error && (
+            <p className="text-xs text-center rounded-lg px-3 py-2"
+              style={{ background: '#ef444420', color: '#f87171' }}>
+              {error}
+            </p>
+          )}
 
           <button onClick={handleSubmit} {...pressProps}
             disabled={loading || (!isLoggedIn && !nim.trim())}
