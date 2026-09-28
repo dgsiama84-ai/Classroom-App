@@ -64,7 +64,26 @@ export async function POST(req: NextRequest) {
 
       if (insertError) {
         if (insertError.code === '23505') {
-          return NextResponse.json({ error: 'Kamu sudah absen di pertemuan ini' }, { status: 409 })
+          const { data: existing } = await supabaseAdmin
+            .from('absensi')
+            .select('tanggal, waktu, status')
+            .eq('nim', mahasiswa.nim)
+            .eq('mata_kuliah_id', session.mata_kuliah_id)
+            .eq('pertemuan', session.pertemuan)
+            .maybeSingle()
+
+          return NextResponse.json({
+            error: 'Kamu sudah absen di pertemuan ini',
+            alreadyAbsent: true,
+            data: {
+              nama: mahasiswa.nama,
+              mataKuliah: session.mata_kuliah.nama,
+              pertemuan: session.pertemuan,
+              tanggal: existing?.tanggal ?? null,
+              waktu: existing?.waktu ?? null,
+              status: existing?.status ?? 'hadir',
+            },
+          }, { status: 409 })
         }
         return NextResponse.json({ error: insertError.message }, { status: 500 })
       }
