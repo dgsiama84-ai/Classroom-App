@@ -269,7 +269,7 @@ export default function AdminAbsensiPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overlay-enter"
           style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
           <div className="w-full max-w-xs rounded-2xl p-5 modal enter"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            style={{ background: 'var(--overlay)', border: '1px solid var(--border)' }}>
             <div className="flex flex-col items-center text-center mb-4">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
                 style={{ background: '#ef444420' }}>
