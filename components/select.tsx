@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface Option { value: string; label: string; disabled?: boolean }
 
@@ -12,21 +13,51 @@ interface SelectProps {
 
 export default function Select({ value, onChange, options, placeholder = 'Pilih...' }: SelectProps) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+  const [coords, setCoords] = useState<{ top: number; left: number; width: number } | null>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => setMounted(true), [])
+
+  // Klik di luar tombol ATAU di luar menu (menu-nya sekarang di-portal ke body,
+  // jadi nggak lagi berada di dalam wrapper div select ini)
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      const target = e.target as Node
+      if (btnRef.current?.contains(target)) return
+      if (menuRef.current?.contains(target)) return
+      setOpen(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
+  // Dropdown di-portal ke <body> (position: fixed) biar nggak kejebak di dalam
+  // stacking context card/tombol manapun (backdrop-blur & animasi tekan tombol
+  // sama-sama bikin stacking context baru, yang bikin z-index lokal nggak berlaku
+  // lintas elemen). Posisinya dihitung dari lokasi tombol tiap kali dibuka/scroll/resize.
+  useEffect(() => {
+    if (!open) return
+    function updatePosition() {
+      const rect = btnRef.current?.getBoundingClientRect()
+      if (rect) setCoords({ top: rect.bottom + 4, left: rect.left, width: rect.width })
+    }
+    updatePosition()
+    window.addEventListener('scroll', updatePosition, true)
+    window.addEventListener('resize', updatePosition)
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true)
+      window.removeEventListener('resize', updatePosition)
+    }
+  }, [open])
+
   const selected = options.find(o => o.value === value)
 
   return (
-    <div ref={ref} className="relative w-full">
+    <div className="relative w-full">
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen(!open)}
         className="w-full px-3 py-2.5 rounded-xl text-sm text-left flex items-center justify-between outline-none"
@@ -46,10 +77,14 @@ export default function Select({ value, onChange, options, placeholder = 'Pilih.
         </span>
       </button>
 
-      {open && (
+      {mounted && open && coords && createPortal(
         <div
-          className="absolute z-[100] w-full mt-1 rounded-xl shadow-lg dropdown-in"
+          ref={menuRef}
+          className="fixed z-[9999] rounded-xl shadow-lg dropdown-in"
           style={{
+            top: coords.top,
+            left: coords.left,
+            width: coords.width,
             background: 'var(--overlay)',
             border: '1px solid var(--border)',
             maxHeight: '240px',
@@ -80,7 +115,8 @@ export default function Select({ value, onChange, options, placeholder = 'Pilih.
               {opt.label}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
