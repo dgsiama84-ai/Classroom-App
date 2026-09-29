@@ -48,9 +48,9 @@ export default function Select({ value, onChange, options, placeholder = 'Pilih.
 
       {open && (
         <div
-          className="absolute z-50 w-full mt-1 rounded-xl shadow-lg dropdown-in"
+          className="absolute z-[100] w-full mt-1 rounded-xl shadow-lg dropdown-in"
           style={{
-            background: 'var(--surface)',
+            background: 'var(--overlay)',
             border: '1px solid var(--border)',
             maxHeight: '240px',
             overflowY: 'auto',
