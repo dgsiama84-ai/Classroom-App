@@ -67,13 +67,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Topbar — hanya mobile */}
-      <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3"
-        style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
-        <span className="font-bold text-sm">Admin</span>
+      <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 rounded-b-3xl"
+        style={{
+          backgroundImage: 'linear-gradient(180deg, rgba(39,164,41,0.32), rgba(11,18,12,0))',
+          backgroundColor: 'var(--surface)',
+          borderBottom: '1px solid var(--border)',
+        }}>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+            style={{ background: 'var(--accent)', color: 'white' }}>
+            {adminName.slice(0, 1).toUpperCase() || 'A'}
+          </div>
+          <span className="font-bold text-sm">Admin</span>
+        </div>
         <div className="flex items-center gap-3">
           <span className="text-xs truncate max-w-[100px]" style={{ color: 'var(--text-muted)' }}>{adminName}</span>
           <button onClick={handleLogout} {...pressProps}
-            className="text-xs px-2.5 py-1.5 rounded-lg"
+            className="text-xs px-3 py-1.5 rounded-full"
             style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
             Keluar
           </button>
@@ -81,27 +91,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto pb-20 md:pb-0 md:p-6">
+      <main className="flex-1 overflow-auto pb-24 md:pb-0 md:p-6">
         {children}
       </main>
 
-      {/* Bottom Navbar — hanya mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex"
-        style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
+      {/* Bottom Navbar — hanya mobile, mengambang dengan highlight pill */}
+      <nav className="md:hidden fixed bottom-3 left-3 right-3 z-50 flex items-center justify-around px-2 py-2 rounded-3xl shadow-lg"
+        style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
         {navItems.map(item => {
           const isActive = pathname === item.href
           return (
             <button key={item.href}
               onClick={() => router.push(item.href)}
               {...pressProps}
-              className="flex-1 flex flex-col items-center gap-1 py-3"
+              className="flex flex-col items-center gap-1 py-1.5 px-3 rounded-2xl transition-all"
               style={{
-                color: isActive ? 'var(--accent)' : 'var(--text-muted)',
-                background: 'none',
+                background: isActive ? 'var(--accent)' : 'transparent',
+                color: isActive ? 'white' : 'var(--text-muted)',
                 border: 'none',
               }}>
               <span className="text-xl">{item.icon}</span>
-              <span className="text-xs font-medium">{item.label}</span>
+              <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           )
         })}
