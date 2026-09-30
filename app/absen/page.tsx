@@ -4,15 +4,8 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { pressProps } from '@/components/pressProps'
 import { CheckCircle2, Loader2, UserCheck, AlertCircle } from 'lucide-react'
-
-interface AbsensiResult {
-  nama: string
-  mataKuliah: string
-  pertemuan: number
-  tanggal: string | null
-  waktu: string | null
-  status?: string
-}
+import { ApiError, ensureMahasiswaToken, submitAbsensiQR } from '@/lib/api'
+import { AbsensiResult } from '@/lib/types'
 
 function AbsenContent() {
   const searchParams = useSearchParams()
@@ -52,32 +45,8 @@ function AbsenContent() {
     setError('')
 
     try {
-      let token = localStorage.getItem('token')
-
-      if (!token) {
-        const loginRes = await fetch('/api/auth/mahasiswa', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nim: nim.trim() }),
-        })
-        const loginJson = await loginRes.json()
-        if (!loginRes.ok || !loginJson.token) {
-          setError(loginJson.error || 'NIM tidak ditemukan')
-          setLoading(false)
-          return
-        }
-        token = loginJson.token
-      }
-
-      const res = await fetch('/api/absensi', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ sessionId: sessionId.trim() }),
-      })
-      const json = await res.json()
+      const token = await ensureMahasiswaToken(nim)
+      const { res, json } = await submitAbsensiQR(sessionId, token)
 
       if (res.status === 401) {
         localStorage.removeItem('token')
@@ -98,8 +67,8 @@ function AbsenContent() {
       }
 
       setResult(json.data)
-    } catch {
-      setError('Tidak dapat terhubung ke server')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Tidak dapat terhubung ke server')
     } finally {
       setLoading(false)
     }
@@ -136,30 +105,29 @@ function AbsenContent() {
   }
 
   if (result) {
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'var(--background)' }}>
-      <div className="w-full max-w-sm rounded-2xl p-6 text-center"
-        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <CheckCircle2 size={48} className="mx-auto mb-3" style={{ color: '#22c55e' }} />
-        <p className="font-bold text-base mb-1" style={{ color: '#22c55e' }}>Absensi Berhasil!</p>
-        <p className="text-sm font-medium mt-3">{result.nama}</p>
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{result.mataKuliah}</p>
-        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-          Pertemuan {result.pertemuan} · {result.tanggal} · {result.waktu}
-        </p>
-        {/* Tambah ini */}
-        <button
-          onClick={() => window.location.href = '/login'}
-          {...pressProps}
-          className="mt-5 w-full py-2.5 rounded-xl text-sm font-medium"
-          style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-          Kembali
-        </button>
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4"
+        style={{ background: 'var(--background)' }}>
+        <div className="w-full max-w-sm rounded-2xl p-6 text-center"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <CheckCircle2 size={48} className="mx-auto mb-3" style={{ color: '#22c55e' }} />
+          <p className="font-bold text-base mb-1" style={{ color: '#22c55e' }}>Absensi Berhasil!</p>
+          <p className="text-sm font-medium mt-3">{result.nama}</p>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{result.mataKuliah}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+            Pertemuan {result.pertemuan} · {result.tanggal} · {result.waktu}
+          </p>
+          <button
+            onClick={() => window.location.href = '/login'}
+            {...pressProps}
+            className="mt-5 w-full py-2.5 rounded-xl text-sm font-medium"
+            style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+            Kembali
+          </button>
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
@@ -207,10 +175,10 @@ function AbsenContent() {
               color: 'white',
               opacity: loading || (!isLoggedIn && !nim.trim()) ? 0.6 : 1,
             }}>
-           {loading
-  ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Menyimpan...</span>
-  : <span className="flex items-center justify-center gap-1.5"><UserCheck size={16} /> Tandai Hadir</span>
-}
+            {loading
+              ? <span className="flex items-center justify-center gap-1.5"><Loader2 size={16} className="animate-spin" /> Menyimpan...</span>
+              : <span className="flex items-center justify-center gap-1.5"><UserCheck size={16} /> Tandai Hadir</span>
+            }
           </button>
         </div>
       </div>

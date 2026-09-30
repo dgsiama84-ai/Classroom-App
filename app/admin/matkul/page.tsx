@@ -6,7 +6,7 @@ import { BookOpen, User, Plus } from 'lucide-react'
 import Spinner from '@/components/Spinner'
 import { pressProps } from '@/components/pressProps'
 
-interface MataKuliah { id: string; kode: string; nama: string; dosen?: string; semester?: string }
+import { MataKuliah } from '@/lib/types'
 
 export default function AdminMatkulPage() {
   const router = useRouter()

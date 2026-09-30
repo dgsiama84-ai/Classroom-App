@@ -4,14 +4,8 @@ import { useSearchParams } from 'next/navigation'
 import jsQR from 'jsqr'
 import { pressProps } from '@/components/pressProps'
 import { CheckCircle2, Camera, Image as ImageIcon, Loader2 } from 'lucide-react'
-
-interface AbsensiResult {
-  nama: string
-  mataKuliah: string
-  pertemuan: number
-  tanggal: string
-  waktu: string
-}
+import { ApiError, ensureMahasiswaToken, submitAbsensiQR } from '@/lib/api'
+import { AbsensiResult } from '@/lib/types'
 
 function AbsensiContent() {
   const searchParams = useSearchParams()
@@ -151,32 +145,8 @@ function AbsensiContent() {
     setError('')
 
     try {
-      let token = localStorage.getItem('token')
-
-      if (!token) {
-        const loginRes = await fetch('/api/auth/mahasiswa', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nim: nim.trim() }),
-        })
-        const loginJson = await loginRes.json()
-        if (!loginRes.ok || !loginJson.token) {
-          setError(loginJson.error || 'NIM tidak ditemukan')
-          setLoading(false)
-          return
-        }
-        token = loginJson.token
-      }
-
-      const res = await fetch('/api/absensi', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ sessionId: sessionId.trim() }),
-      })
-      const json = await res.json()
+      const token = await ensureMahasiswaToken(nim)
+      const { res, json } = await submitAbsensiQR(sessionId, token)
 
       if (!res.ok || !json.success) {
         setError(json.error || `Error ${res.status}`)
@@ -186,8 +156,8 @@ function AbsensiContent() {
       setResult(json.data)
       setSessionId('')
       setNim('')
-    } catch {
-      setError('Tidak dapat terhubung ke server')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Tidak dapat terhubung ke server')
     } finally {
       setLoading(false)
     }

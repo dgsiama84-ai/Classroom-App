@@ -14,6 +14,41 @@ async function getMahasiswaFromToken(req: NextRequest) {
   return payload as { nim: string; nama: string; kelas: string }
 }
 
+// Dipakai oleh path QR-session maupun path manual — sebelumnya dua-duanya
+// menduplikasi blok insert + cek "sudah absen" dengan cara berbeda (yang manual
+// bahkan rawan race condition karena cek-lalu-insert terpisah). Sekarang satu
+// fungsi, insert dulu dan andalkan unique constraint DB buat deteksi duplikat.
+async function insertAbsensi(params: {
+  nim: string
+  nama: string
+  kelas: string
+  mata_kuliah_id: string
+  pertemuan: number
+}) {
+  const { tanggal, waktu } = nowInMakassar()
+
+  const { data, error } = await supabaseAdmin
+    .from('absensi')
+    .insert({ ...params, tanggal, waktu, status: 'hadir' })
+    .select()
+    .single()
+
+  if (!error) return { alreadyExists: false as const, data, tanggal, waktu }
+
+  if (error.code === '23505') {
+    const { data: existing } = await supabaseAdmin
+      .from('absensi')
+      .select('tanggal, waktu, status')
+      .eq('nim', params.nim)
+      .eq('mata_kuliah_id', params.mata_kuliah_id)
+      .eq('pertemuan', params.pertemuan)
+      .maybeSingle()
+    return { alreadyExists: true as const, existing }
+  }
+
+  throw new Error(error.message)
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -47,45 +82,33 @@ export async function POST(req: NextRequest) {
         )
       }
 
-      const { tanggal, waktu } = nowInMakassar()
-
-      const { error: insertError } = await supabaseAdmin
-        .from('absensi')
-        .insert({
+      let inserted
+      try {
+        inserted = await insertAbsensi({
           nim: mahasiswa.nim,
           nama: mahasiswa.nama,
           kelas: mahasiswa.kelas,
           mata_kuliah_id: session.mata_kuliah_id,
           pertemuan: session.pertemuan,
-          tanggal,
-          waktu,
-          status: 'hadir',
         })
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Gagal menyimpan absensi'
+        return NextResponse.json({ error: msg }, { status: 500 })
+      }
 
-      if (insertError) {
-        if (insertError.code === '23505') {
-          const { data: existing } = await supabaseAdmin
-            .from('absensi')
-            .select('tanggal, waktu, status')
-            .eq('nim', mahasiswa.nim)
-            .eq('mata_kuliah_id', session.mata_kuliah_id)
-            .eq('pertemuan', session.pertemuan)
-            .maybeSingle()
-
-          return NextResponse.json({
-            error: 'Kamu sudah absen di pertemuan ini',
-            alreadyAbsent: true,
-            data: {
-              nama: mahasiswa.nama,
-              mataKuliah: session.mata_kuliah.nama,
-              pertemuan: session.pertemuan,
-              tanggal: existing?.tanggal ?? null,
-              waktu: existing?.waktu ?? null,
-              status: existing?.status ?? 'hadir',
-            },
-          }, { status: 409 })
-        }
-        return NextResponse.json({ error: insertError.message }, { status: 500 })
+      if (inserted.alreadyExists) {
+        return NextResponse.json({
+          error: 'Kamu sudah absen di pertemuan ini',
+          alreadyAbsent: true,
+          data: {
+            nama: mahasiswa.nama,
+            mataKuliah: session.mata_kuliah.nama,
+            pertemuan: session.pertemuan,
+            tanggal: inserted.existing?.tanggal ?? null,
+            waktu: inserted.existing?.waktu ?? null,
+            status: inserted.existing?.status ?? 'hadir',
+          },
+        }, { status: 409 })
       }
 
       appendToSheet({
@@ -102,8 +125,8 @@ export async function POST(req: NextRequest) {
           nama: mahasiswa.nama,
           mataKuliah: session.mata_kuliah.nama,
           pertemuan: session.pertemuan,
-          tanggal,
-          waktu,
+          tanggal: inserted.tanggal,
+          waktu: inserted.waktu,
         },
       })
     } else {
@@ -113,28 +136,19 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 })
       }
 
-      const { data: existing } = await supabaseAdmin
-        .from('absensi')
-        .select('id')
-        .eq('nim', nim)
-        .eq('mata_kuliah_id', mata_kuliah_id)
-        .eq('pertemuan', pertemuan)
-        .single()
+      let inserted
+      try {
+        inserted = await insertAbsensi({ nim, nama, kelas, mata_kuliah_id, pertemuan })
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Gagal menyimpan absensi'
+        return NextResponse.json({ error: msg }, { status: 500 })
+      }
 
-      if (existing) {
+      if (inserted.alreadyExists) {
         return NextResponse.json({ error: 'Kamu sudah absen di pertemuan ini' }, { status: 409 })
       }
 
-      const { tanggal, waktu } = nowInMakassar()
-
-      const { data, error } = await supabaseAdmin
-        .from('absensi')
-        .insert({ nim, nama, kelas, mata_kuliah_id, pertemuan, tanggal, waktu, status: 'hadir' })
-        .select()
-        .single()
-
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-      return NextResponse.json({ success: true, data })
+      return NextResponse.json({ success: true, data: inserted.data })
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'

@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import { getAdminSession } from '@/lib/auth'
 import Select from '@/components/select'
 import Spinner from '@/components/Spinner'
+import { MataKuliah } from '@/lib/types'
 
-interface MataKuliah { id: string; kode: string; nama: string; dosen?: string }
 interface Tugas {
   id: string; judul: string; deskripsi: string; deadline: string
   mata_kuliah: { kode: string; nama: string }

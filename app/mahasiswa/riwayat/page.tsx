@@ -5,23 +5,9 @@ import { getMahasiswaSession } from '@/lib/auth'
 import Spinner from '@/components/Spinner'
 import { pressProps } from '@/components/pressProps'
 import { ACTIVE_SEMESTER } from '@/lib/config'
-
-interface AbsensiRecord {
-  id: string
-  mata_kuliah_id: string
-  pertemuan: number
-  tanggal: string
-  waktu: string
-  status: 'hadir' | 'sakit' | 'izin' | 'alpa'
-  mata_kuliah: { kode: string; nama: string; semester?: string }
-}
-
-const statusConfig = {
-  hadir: { label: '✓ Hadir', text: 'text-green-400', bg: '#22c55e20' },
-  sakit: { label: 'S Sakit', text: 'text-blue-400', bg: '#3b82f620' },
-  izin:  { label: 'I Izin',  text: 'text-yellow-400', bg: '#eab30820' },
-  alpa:  { label: 'A Alpa',  text: 'text-red-400', bg: '#ef444420' },
-}
+import { apiFetch } from '@/lib/api'
+import { statusMeta } from '@/lib/status'
+import { AbsensiRecord } from '@/lib/types'
 
 export default function RiwayatPage() {
   const session = getMahasiswaSession()
@@ -32,22 +18,18 @@ export default function RiwayatPage() {
 
   useEffect(() => {
     if (!session) return
-    const token = localStorage.getItem('token')
-    fetch('/api/absensi', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(r => r.json())
+    apiFetch<{ data: AbsensiRecord[] }>('/api/absensi')
       .then(json => {
         // Terbaru dulu (tanggal & jam), biar matkul semester ini nongol di atas,
         // bukan matkul lama cuma karena id-nya lebih kecil secara string.
-        const sorted = (json.data || []).sort((a: AbsensiRecord, b: AbsensiRecord) => {
+        const sorted = (json.data || []).sort((a, b) => {
           const dateCompare = b.tanggal.localeCompare(a.tanggal)
           if (dateCompare !== 0) return dateCompare
           return b.waktu.localeCompare(a.waktu)
         })
         setData(sorted)
-        setLoading(false)
       })
+      .finally(() => setLoading(false))
   }, [session?.nim])
 
   // Pisah semester aktif vs semester lalu, biar nggak campur kayak sebelumnya
@@ -115,7 +97,7 @@ export default function RiwayatPage() {
       ) : (
         <div className="space-y-2">
           {filtered.map(item => {
-            const s = statusConfig[item.status] ?? statusConfig.hadir
+            const s = statusMeta(item.status ?? 'hadir', '20')
             return (
               <div key={item.id} className="rounded-xl px-4 py-3 flex items-center justify-between fade-in"
                 style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
