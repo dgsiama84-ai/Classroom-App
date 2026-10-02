@@ -4,6 +4,7 @@ import { getAdminSession, clearSession } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { ClipboardList, BookOpen, GraduationCap } from 'lucide-react'
+import { useSwipeNav } from '@/components/useSwipeNav'
 
 const navItems = [
   { href: '/admin/absensi', label: 'Absensi', icon: <ClipboardList size={20} /> },
@@ -15,6 +16,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
   const pathname = usePathname()
   const [adminName, setAdminName] = useState('')
+  
+  // 1. Inisialisasi swipe hook
+  const swipe = useSwipeNav(navItems.map(n => n.href))
   
   useEffect(() => {
     const session = getAdminSession()
@@ -28,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen flex flex-col md:flex-row overflow-hidden" style={{ background: 'var(--background)' }}>
 
       {/* Sidebar — hanya desktop */}
       <aside className="hidden md:flex w-56 flex-col py-6 px-4 shrink-0 min-h-screen"
@@ -67,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Topbar — hanya mobile */}
-      <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 rounded-b-3xl"
+      <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 rounded-b-3xl shadow-sm"
         style={{
           backgroundImage: 'linear-gradient(180deg, rgba(39,164,41,0.32), rgba(11,18,12,0))',
           backgroundColor: 'var(--surface)',
@@ -90,12 +94,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </div>
 
-      {/* Main content */}
-      <main ref={swipe.ref} {...swipe.handlers} style={swipe.style} className="...">
-  {children}
-</main>
+      {/* Main content - Diperbarui dengan flex-1 dan padding yang benar */}
+      <main 
+        ref={swipe.ref} 
+        {...swipe.handlers} 
+        style={{ ...swipe.style }} 
+        className="flex-1 w-full p-4 md:p-8 pb-28 md:pb-8 overflow-x-hidden overflow-y-auto"
+      >
+        {children}
+      </main>
 
-      {/* Bottom Navbar — hanya mobile, mengambang dengan highlight pill */}
+      {/* Bottom Navbar — hanya mobile */}
       <nav className="md:hidden fixed bottom-3 left-3 right-3 z-50 flex items-center justify-around px-2 py-2 rounded-3xl shadow-lg"
         style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
         {navItems.map(item => {
@@ -110,7 +119,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 color: isActive ? 'white' : 'var(--text-muted)',
                 border: 'none',
               }}>
-              <span className="text-xl">{item.icon}</span>
+              <span className="text-xl flex justify-center items-center h-6">{item.icon}</span>
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           )
