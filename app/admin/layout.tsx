@@ -4,7 +4,6 @@ import { getAdminSession, clearSession } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { ClipboardList, BookOpen, GraduationCap } from 'lucide-react'
-import { useSwipeNav } from '@/components/useSwipeNav'
 
 const navItems = [
   { href: '/admin/absensi', label: 'Absensi', icon: <ClipboardList size={20} /> },
@@ -16,7 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
   const pathname = usePathname()
   const [adminName, setAdminName] = useState('')
-  const swipe = useSwipeNav(navItems.map(n => n.href))
+  
   useEffect(() => {
     const session = getAdminSession()
     if (!session) { router.replace('/login'); return }
