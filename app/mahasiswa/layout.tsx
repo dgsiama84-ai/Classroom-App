@@ -33,7 +33,7 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen flex flex-col overflow-x-hidden" style={{ background: 'var(--background)' }}>
       {/* Topbar */}
       <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 rounded-b-3xl"
         style={{
@@ -61,7 +61,7 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Content — padding bottom agar tidak ketutup navbar */}
-      <main {...swipe} className="flex-1 pb-24 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
+      <main {...swipe.handlers} style={swipe.style} className="flex-1 pb-24 overflow-y-auto">
             {children}
       </main>
 
