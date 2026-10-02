@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { getMahasiswaSession, clearSession } from '@/lib/auth'
 import { ClipboardList, BookOpen, History, Bot, GraduationCap } from 'lucide-react'
+import { useSwipeNav } from '@/components/useSwipeNav'
 
 const navItems = [
   { href: '/mahasiswa/absensi', label: 'Absensi', icon: <ClipboardList size={20} /> },
@@ -16,7 +17,7 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
   const router = useRouter()
   const pathname = usePathname()
   const [nama, setNama] = useState('')
-
+  const swipe = useSwipeNav(navItems.map(n => n.href))
   useEffect(() => {
     const session = getMahasiswaSession()
     if (!session) {
@@ -60,8 +61,8 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Content — padding bottom agar tidak ketutup navbar */}
-      <main className="flex-1 pb-24 overflow-y-auto">
-        {children}
+      <main {...swipe} className="flex-1 pb-24 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
+            {children}
       </main>
 
       {/* Bottom nav — mengambang, item aktif dapat highlight pill */}
