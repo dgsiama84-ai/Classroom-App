@@ -4,6 +4,7 @@ import { getAdminSession, clearSession } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { ClipboardList, BookOpen, GraduationCap } from 'lucide-react'
+import { useSwipeNav } from '@/components/useSwipeNav'
 
 const navItems = [
   { href: '/admin/absensi', label: 'Absensi', icon: <ClipboardList size={20} /> },
@@ -26,6 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     clearSession()
     router.replace('/login')
   }
+  const swipe = useSwipeNav(navItems.map(n => n.href))
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'var(--background)' }}>
@@ -91,9 +93,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto pb-24 md:pb-0 md:p-6">
-        {children}
-      </main>
+      <main ref={swipe.ref} {...swipe.handlers} style={swipe.style} className="...">
+  {children}
+</main>
 
       {/* Bottom Navbar — hanya mobile, mengambang dengan highlight pill */}
       <nav className="md:hidden fixed bottom-3 left-3 right-3 z-50 flex items-center justify-around px-2 py-2 rounded-3xl shadow-lg"
