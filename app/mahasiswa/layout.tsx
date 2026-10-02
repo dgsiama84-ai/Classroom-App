@@ -61,9 +61,9 @@ export default function MahasiswaLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Content — padding bottom agar tidak ketutup navbar */}
-      <main {...swipe.handlers} style={swipe.style} className="flex-1 pb-24 overflow-y-auto">
-            {children}
-      </main>
+      <main ref={swipe.ref} {...swipe.handlers} style={swipe.style} className="flex-1 pb-24 overflow-y-auto">
+  {children}
+</main>
 
       {/* Bottom nav — mengambang, item aktif dapat highlight pill */}
       <nav className="fixed bottom-3 left-3 right-3 z-50 flex items-center justify-around px-2 py-2 rounded-3xl shadow-lg"
