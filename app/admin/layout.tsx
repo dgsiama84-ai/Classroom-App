@@ -16,7 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
   const pathname = usePathname()
   const [adminName, setAdminName] = useState('')
-
+  const swipe = useSwipeNav(navItems.map(n => n.href))
   useEffect(() => {
     const session = getAdminSession()
     if (!session) { router.replace('/login'); return }
@@ -27,7 +27,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     clearSession()
     router.replace('/login')
   }
-  const swipe = useSwipeNav(navItems.map(n => n.href))
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'var(--background)' }}>
