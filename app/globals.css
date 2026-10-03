@@ -3,46 +3,44 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0b120c;
-  --surface: rgba(190, 255, 200, 0.09);
-  --surface2: rgba(190, 255, 200, 0.15);
-  --border: rgba(230, 255, 230, 0.16);
+  --bg: #09090b;
+  --surface: #18181b;
+  --surface2: #27272a;
+  --border: #3f3f46;
 
-  --overlay: rgba(9, 18, 11, 0.96);
-  --accent: #27a429;
-  --accent-light:#46ac32;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --text: #e3f0e2;
-  --text-muted: #94b896;
+  --overlay: rgba(9, 9, 11, 0.96);
+  --accent: #10b981;
+  --accent-light: #34d399;
+  --accent-soft: rgba(16, 185, 129, 0.15);
+  --on-accent: #052e16;
+  --success: #10b981;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-dim: #71717a;
 }
+
 * {
   box-sizing: border-box;
 }
 
 body {
   background-color: var(--bg);
-  background-image:
-    radial-gradient(680px circle at 12% 8%, rgba(39, 164, 41, 0.30), transparent 60%),
-    radial-gradient(620px circle at 92% 22%, rgba(45, 190, 170, 0.20), transparent 55%),
-    radial-gradient(640px circle at 25% 95%, rgba(70, 172, 50, 0.16), transparent 60%);
-  background-attachment: fixed;
-  background-repeat: no-repeat;
   color: var(--text);
   min-height: 100vh;
 }
 
+/* Card: solid, tanpa blur (lebih ringan di HP) */
 [style*="var(--surface)"] {
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
+/* Modal/overlay tetap pakai blur */
 [style*="var(--overlay)"] {
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
 }
 
 /* Scrollbar */
