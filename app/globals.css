@@ -4,26 +4,26 @@
 
 :root {
   --bg: #000000;
-  --surface: #0f0f10;
-  --surface2: #1a1a1c;
-  --border: #2a2a2d;
+  --surface: #121212;
+  --surface2: #262626;
+  --border: #363636;
 
   --overlay: rgba(0, 0, 0, 0.96);
 
-  /* Aksen utama sekarang putih (tombol, tab aktif) */
-  --accent: #fafafa;
-  --accent-soft: rgba(255, 255, 255, 0.08);
-  --on-accent: #09090b;
+  /* Semua aksen jadi putih */
+  --accent: #ffffff;
+  --accent-light: #ffffff;
+  --accent-soft: rgba(255, 255, 255, 0.10);
+  --on-accent: #000000;
 
-  /* Hijau hanya untuk teks/ikon highlight & status */
-  --accent-light: #34d399;
-  --success: #34d399;
-
+  /* Warna fungsional, dipakai seperlunya */
+  --success: #ffffff;
   --warning: #fbbf24;
-  --danger: #f87171;
-  --text: #fafafa;
-  --text-muted: #a1a1aa;
-  --text-dim: #71717a;
+  --danger: #ed4956; /* merah Instagram */
+
+  --text: #f5f5f5;
+  --text-muted: #a8a8a8;
+  --text-dim: #737373;
 }
 
 * {
