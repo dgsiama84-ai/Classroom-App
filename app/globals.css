@@ -3,17 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --bg: #09090b;
-  --surface: #18181b;
-  --surface2: #27272a;
-  --border: #3f3f46;
+  --bg: #000000;
+  --surface: #0f0f10;
+  --surface2: #1a1a1c;
+  --border: #2a2a2d;
 
-  --overlay: rgba(9, 9, 11, 0.96);
-  --accent: #10b981;
+  --overlay: rgba(0, 0, 0, 0.96);
+
+  /* Aksen utama sekarang putih (tombol, tab aktif) */
+  --accent: #fafafa;
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  --on-accent: #09090b;
+
+  /* Hijau hanya untuk teks/ikon highlight & status */
   --accent-light: #34d399;
-  --accent-soft: rgba(16, 185, 129, 0.15);
-  --on-accent: #052e16;
-  --success: #10b981;
+  --success: #34d399;
+
   --warning: #fbbf24;
   --danger: #f87171;
   --text: #fafafa;
