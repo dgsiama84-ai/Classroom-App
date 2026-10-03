@@ -3,27 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --bg: #000000;
-  --surface: #121212;
-  --surface2: #262626;
-  --border: #363636;
+  /* Surface bertingkat (ala WhatsApp) */
+  --bg: #0b141a;
+  --surface: #111b21;
+  --surface2: #202c33;
+  --border: #2a3942;
 
-  --overlay: rgba(0, 0, 0, 0.96);
+  --overlay: rgba(11, 20, 26, 0.96);
 
-  /* Semua aksen jadi putih */
-  --accent: #ffffff;
-  --accent-light: #ffffff;
-  --accent-soft: rgba(255, 255, 255, 0.10);
-  --on-accent: #000000;
+  /* Accent: hijau WhatsApp */
+  --accent: #00a884;
+  --accent-light: #25d366;
+  --accent-soft: rgba(0, 168, 132, 0.16);
+  --on-accent: #0b141a;
+  --bubble: #005c4b; /* bubble "pesan terkirim", cocok untuk badge/status hadir */
 
-  /* Warna fungsional, dipakai seperlunya */
-  --success: #ffffff;
-  --warning: #fbbf24;
-  --danger: #ed4956; /* merah Instagram */
+  --success: #25d366;
+  --warning: #ffd279;
+  --danger: #f15c6d;
+  --info: #53bdeb; /* biru centang & link WA */
 
-  --text: #f5f5f5;
-  --text-muted: #a8a8a8;
-  --text-dim: #737373;
+  --text: #e9edef;
+  --text-muted: #8696a0;
+  --text-dim: #667781;
 }
 
 * {
@@ -36,12 +38,10 @@ body {
   min-height: 100vh;
 }
 
-/* Card: solid, tanpa blur (lebih ringan di HP) */
 [style*="var(--surface)"] {
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
 }
 
-/* Modal/overlay tetap pakai blur */
 [style*="var(--overlay)"] {
   backdrop-filter: blur(18px) saturate(120%);
   -webkit-backdrop-filter: blur(18px) saturate(120%);
