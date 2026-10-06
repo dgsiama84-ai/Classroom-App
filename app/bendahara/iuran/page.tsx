@@ -48,6 +48,7 @@ async function iuranFetch(path: string, options: RequestInit = {}) {
 export default function IuranPage() {
   const router = useRouter()
   const [periode, setPeriode] = useState<Periode[]>([])
+  const [totalMhs, setTotalMhs] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -80,6 +81,7 @@ export default function IuranPage() {
       return
     }
     setPeriode(json.data || [])
+    setTotalMhs(json.total_mahasiswa || 0)
     setLoading(false)
   }
 
@@ -492,7 +494,8 @@ export default function IuranPage() {
       ) : (
         <div className="space-y-3">
           {periode.map(p => {
-            const pct = p.sudah_bayar > 0 ? Math.min(100, Math.round((p.terkumpul / (47 * p.nominal)) * 100)) : 0
+            const target = totalMhs * p.nominal
+            const pct = target > 0 ? Math.min(100, Math.round((p.terkumpul / target) * 100)) : 0
             return (
               <Card key={p.id} className="p-4 hover:shadow-md transition-shadow fade-in">
                 <button
@@ -511,7 +514,7 @@ export default function IuranPage() {
                     <div className="text-right shrink-0">
                       <p className="text-sm font-semibold">{p.sudah_bayar}</p>
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                        dari 47
+                        dari {totalMhs}
                       </p>
                     </div>
                   </div>
