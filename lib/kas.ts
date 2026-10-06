@@ -17,9 +17,10 @@ export interface KasRingkasan {
   saldo: number
 }
 
+// Pemasukan hanya lewat halaman Iuran, jadi cuma pengeluaran yang punya pilihan kategori
 export const KAS_KATEGORI: Record<KasJenis, string[]> = {
-  pemasukan: ['Iuran', 'Donasi', 'Lainnya'],
-  pengeluaran: ['Fotokopi', 'Konsumsi', 'Kegiatan', 'Lainnya'],
+  pemasukan: [],
+  pengeluaran: ['Zoom', 'Print', 'Fotokopi', 'Konsumsi', 'Kegiatan', 'Lainnya'],
 }
 
 export function formatRupiah(n: number): string {
@@ -45,11 +46,4 @@ export interface IuranPeriode {
   created_at: string
   sudah_bayar: number
   terkumpul: number
-}
-
-export interface IuranRow {
-  nim: string
-  nama: string
-  kelas: string
-  bayar: { id: string; jumlah: number; tanggal: string } | null
 }
