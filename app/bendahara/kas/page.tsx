@@ -8,11 +8,11 @@ import Card from '@/components/Card'
 import Spinner from '@/components/Spinner'
 import {
   KAS_KATEGORI, formatRupiah, parseRupiah, formatTanggalPendek,
-  type KasJenis, type KasTransaksi, type KasRingkasan,
+  type KasTransaksi, type KasRingkasan,
 } from '@/lib/kas'
 import { nowInMakassar } from '@/lib/utils'
 
-type Filter = 'semua' | KasJenis
+type Trx = KasTransaksi & { periode_id?: string | null }
 
 async function kasFetch(options: RequestInit = {}) {
   const token = localStorage.getItem('bendahara_token')
@@ -29,18 +29,16 @@ async function kasFetch(options: RequestInit = {}) {
 
 export default function KasPage() {
   const router = useRouter()
-  const [list, setList] = useState<KasTransaksi[]>([])
+  const [list, setList] = useState<Trx[]>([])
   const [ringkasan, setRingkasan] = useState<KasRingkasan>({ pemasukan: 0, pengeluaran: 0, saldo: 0 })
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [deleting, setDeleting] = useState<string | null>(null)
-  const [filter, setFilter] = useState<Filter>('semua')
   const [copied, setCopied] = useState(false)
 
-  // Form
-  const [jenis, setJenis] = useState<KasJenis>('pemasukan')
+  // Form (khusus pengeluaran)
   const [jumlahText, setJumlahText] = useState('')
   const [keterangan, setKeterangan] = useState('')
   const [kategori, setKategori] = useState('')
@@ -79,7 +77,7 @@ export default function KasPage() {
 
     const { res, json } = await kasFetch({
       method: 'POST',
-      body: JSON.stringify({ jenis, jumlah, keterangan, kategori: kategori || null, tanggal }),
+      body: JSON.stringify({ jenis: 'pengeluaran', jumlah, keterangan, kategori: kategori || null, tanggal }),
     })
     setSaving(false)
     if (res.status === 401) return sessionExpired()
@@ -90,7 +88,7 @@ export default function KasPage() {
     load()
   }
 
-  async function handleDelete(t: KasTransaksi) {
+  async function handleDelete(t: Trx) {
     if (!confirm(`Hapus "${t.keterangan}" (${formatRupiah(t.jumlah)})?`)) return
     setDeleting(t.id)
     const { res } = await kasFetch({ method: 'DELETE', body: JSON.stringify({ id: t.id }) })
@@ -99,23 +97,25 @@ export default function KasPage() {
     load()
   }
 
-  const filtered = useMemo(
-    () => (filter === 'semua' ? list : list.filter(t => t.jenis === filter)),
-    [list, filter]
+  // Riwayat: pengeluaran + pemasukan non-iuran (iuran dilihat di halaman Iuran)
+  const riwayat = useMemo(
+    () => list.filter(t => t.jenis === 'pengeluaran' || !t.periode_id),
+    [list]
   )
 
   // Format teks siap tempel ke grup WhatsApp kelas
   async function copyLaporan() {
-    const baris = list.slice(0, 10).map(t =>
-      `${t.jenis === 'pemasukan' ? '＋' : '－'} ${formatTanggalPendek(t.tanggal)} · ${t.keterangan} · ${formatRupiah(t.jumlah)}`
-    )
+    const baris = list
+      .filter(t => t.jenis === 'pengeluaran')
+      .slice(0, 10)
+      .map(t => `－ ${formatTanggalPendek(t.tanggal)} · ${t.keterangan} · ${formatRupiah(t.jumlah)}`)
     const teks = [
       '*LAPORAN KAS KELAS 25MA2*',
       `Saldo: *${formatRupiah(ringkasan.saldo)}*`,
-      `Pemasukan: ${formatRupiah(ringkasan.pemasukan)}`,
+      `Iuran masuk: ${formatRupiah(ringkasan.pemasukan)}`,
       `Pengeluaran: ${formatRupiah(ringkasan.pengeluaran)}`,
       '',
-      '*10 transaksi terakhir*',
+      '*10 pengeluaran terakhir*',
       ...baris,
     ].join('\n')
     try {
@@ -136,10 +136,12 @@ export default function KasPage() {
         <button onClick={() => { setShowForm(!showForm); setError('') }} {...pressProps}
           className="text-sm px-3 py-1.5 rounded-lg font-semibold"
           style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>
-          {showForm ? '✕ Tutup' : '+ Catat'}
+          {showForm ? '✕ Tutup' : '+ Pengeluaran'}
         </button>
       </div>
-      <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>Buku kas · 25MA2</p>
+      <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+        Pemasukan otomatis dari iuran · 25MA2
+      </p>
 
       {/* Ringkasan */}
       <Card className="p-5 mb-4">
@@ -152,7 +154,7 @@ export default function KasPage() {
         </div>
         <div className="grid grid-cols-2 gap-3 mt-4">
           <div className="rounded-xl p-3" style={{ background: 'var(--surface2)' }}>
-            <div className="text-[11px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Pemasukan</div>
+            <div className="text-[11px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Iuran masuk</div>
             <div className="text-sm font-semibold" style={{ color: 'var(--accent-light)' }}>{formatRupiah(ringkasan.pemasukan)}</div>
           </div>
           <div className="rounded-xl p-3" style={{ background: 'var(--surface2)' }}>
@@ -167,22 +169,10 @@ export default function KasPage() {
         </button>
       </Card>
 
-      {/* Form */}
+      {/* Form pengeluaran */}
       {showForm && (
         <Card className="p-4 mb-4 space-y-3 fade-in">
-          <div className="flex rounded-xl p-1" style={{ background: 'var(--surface2)' }}>
-            {(['pemasukan', 'pengeluaran'] as const).map(j => (
-              <button key={j} onClick={() => { setJenis(j); setKategori('') }} {...pressProps}
-                className="flex-1 py-2 rounded-lg text-sm font-medium capitalize"
-                style={{
-                  background: jenis === j ? 'var(--surface)' : 'transparent',
-                  color: jenis === j ? (j === 'pemasukan' ? 'var(--accent-light)' : 'var(--danger)') : 'var(--text-muted)',
-                  border: 'none',
-                }}>
-                {j}
-              </button>
-            ))}
-          </div>
+          <div className="text-sm font-semibold">Catat pengeluaran</div>
 
           <div>
             <label className="text-xs block mb-1.5" style={{ color: 'var(--text-muted)' }}>Jumlah</label>
@@ -198,14 +188,14 @@ export default function KasPage() {
           <div>
             <label className="text-xs block mb-1.5" style={{ color: 'var(--text-muted)' }}>Keterangan</label>
             <input value={keterangan} onChange={e => setKeterangan(e.target.value)} maxLength={120}
-              placeholder={jenis === 'pemasukan' ? 'mis. Iuran minggu 3' : 'mis. Fotokopi materi Statistik'}
+              placeholder="mis. Zoom, Print absen"
               className="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style={inputStyle} />
           </div>
 
           <div>
             <label className="text-xs block mb-1.5" style={{ color: 'var(--text-muted)' }}>Kategori (opsional)</label>
             <div className="flex flex-wrap gap-2">
-              {KAS_KATEGORI[jenis].map(k => (
+              {KAS_KATEGORI.pengeluaran.map(k => (
                 <button key={k} onClick={() => setKategori(kategori === k ? '' : k)} {...pressProps}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium"
                   style={{
@@ -231,39 +221,24 @@ export default function KasPage() {
           <button onClick={handleSave} disabled={saving} {...pressProps}
             className="w-full py-3 rounded-xl text-sm font-semibold"
             style={{ background: 'var(--accent)', color: 'var(--on-accent)', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Menyimpan...' : 'Simpan Transaksi'}
+            {saving ? 'Menyimpan...' : 'Simpan pengeluaran'}
           </button>
         </Card>
       )}
 
       {!showForm && error && <p className="text-xs mb-3" style={{ color: 'var(--danger)' }}>{error}</p>}
 
-      {/* Filter */}
-      <div className="flex gap-2 mb-3">
-        {([['semua', 'Semua'], ['pemasukan', 'Masuk'], ['pengeluaran', 'Keluar']] as const).map(([v, label]) => (
-          <button key={v} onClick={() => setFilter(v)} {...pressProps}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium"
-            style={{
-              background: filter === v ? 'var(--accent-soft)' : 'var(--surface)',
-              border: `1px solid ${filter === v ? 'var(--accent)' : 'var(--border)'}`,
-              color: filter === v ? 'var(--accent-light)' : 'var(--text-muted)',
-            }}>
-            {label}
-          </button>
-        ))}
-      </div>
-
       {/* Riwayat */}
       {loading ? (
         <Spinner />
-      ) : filtered.length === 0 ? (
+      ) : riwayat.length === 0 ? (
         <div className="text-center py-14">
           <Wallet size={40} className="mx-auto mb-3" style={{ color: 'var(--text-dim)' }} />
-          <p style={{ color: 'var(--text-muted)' }}>Belum ada transaksi</p>
+          <p style={{ color: 'var(--text-muted)' }}>Belum ada pengeluaran</p>
         </div>
       ) : (
         <div className="space-y-2">
-          {filtered.map(t => {
+          {riwayat.map(t => {
             const masuk = t.jenis === 'pemasukan'
             return (
               <Card key={t.id} className="p-3 flex items-center gap-3 fade-in">
