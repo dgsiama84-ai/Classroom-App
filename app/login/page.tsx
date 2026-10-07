@@ -1,5 +1,5 @@
 'use client'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -7,6 +7,36 @@ import {
   getMahasiswaSession, getAdminSession, getBendaharaSession,
 } from '@/lib/auth'
 import { pressProps } from '@/components/pressProps'
+
+// Style field + perbaikan autofill Chrome (yang bikin input jadi biru muda & teks hitam)
+const loginCss = `
+.login-field {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px;
+  border-radius: 16px;
+  font-size: 16px;
+  outline: none;
+  color: var(--text);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color-scheme: dark;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+.login-field::placeholder { color: var(--text-dim); }
+.login-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.login-field:-webkit-autofill,
+.login-field:-webkit-autofill:hover,
+.login-field:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface2) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+`
 
 export default function LoginPage() {
   const router = useRouter()
@@ -72,88 +102,86 @@ export default function LoginPage() {
     }
   }
 
-  // Input minimalis: hanya garis bawah. font 16px biar tidak auto-zoom di iOS.
-  const inputStyle = {
-    background: 'transparent',
-    border: 'none',
-    borderBottom: '1px solid var(--border)',
-    color: 'var(--text)',
-  }
-  const focusLine = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderBottomColor = 'var(--accent)' }
-  const blurLine = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderBottomColor = 'var(--border)' }
-
   return (
-    <div className="min-h-screen flex flex-col justify-center px-7 py-10" style={{ background: '#0f1710' }}>
-      <div className="w-full max-w-sm mx-auto fade-in">
+    <div className="relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#0f1710' }}>
+      <style>{loginCss}</style>
 
-        {/* Header */}
-        <div className="mb-12">
-          <img src="/logo.png" alt="STIE-PB" className="w-11 h-11 rounded-full object-cover mb-6" />
-          <h1 className="text-2xl font-semibold tracking-tight text-white">Kelas 25MA 2</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Sistem Kelas Digital</p>
-        </div>
+      {/* Cahaya tipis di pojok atas, cuma aksen */}
+      <div aria-hidden className="pointer-events-none absolute -top-40 -right-32 w-96 h-96 rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(0,168,132,0.16) 0%, transparent 70%)' }} />
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-7">
-          <div>
-            <label htmlFor="login-id" className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
-              NIM atau username
-            </label>
-            <input
-              id="login-id"
-              type="text"
-              value={id}
-              onChange={e => { setId(e.target.value); setError('') }}
-              placeholder="Masukkan NIM kamu"
-              required
-              autoCapitalize="none"
-              autoCorrect="off"
-              className="w-full py-3 text-base outline-none transition-colors"
-              style={inputStyle}
-              onFocus={focusLine}
-              onBlur={blurLine}
-            />
-          </div>
+      {/* Atas: logo + nama */}
+      <header className="relative flex items-center gap-3 px-7 pt-10">
+        <img src="/logo.png" alt="STIE-PB" className="w-10 h-10 rounded-full object-cover" />
+        <span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Kelas 25MA 2</span>
+      </header>
 
-          {needsPassword && (
-            <div className="fade-in">
-              <label htmlFor="login-password" className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
-                Password
+      {/* Tengah: judul + form */}
+      <main className="relative flex-1 flex flex-col justify-center px-7 pb-16">
+        <div className="w-full max-w-sm mx-auto fade-in">
+          <h1 className="text-[34px] leading-tight font-bold tracking-tight text-white">
+            Masuk ke<br />kelas digital
+          </h1>
+          <p className="text-sm mt-3 mb-10" style={{ color: 'var(--text-muted)' }}>
+            Mahasiswa cukup pakai NIM. Staff pakai username dan password.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="login-id" className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
+                NIM atau username
               </label>
-              <div className="relative">
-                <input
-                  id="login-password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="Password"
-                  required
-                  className="w-full py-3 pr-9 text-base outline-none transition-colors"
-                  style={inputStyle}
-                  onFocus={focusLine}
-                  onBlur={blurLine}
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  {...pressProps}
-                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 p-1"
-                  style={{ color: 'var(--text-muted)' }}>
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
+              <input
+                id="login-id"
+                type="text"
+                value={id}
+                onChange={e => { setId(e.target.value); setError('') }}
+                placeholder="Masukkan NIM kamu"
+                required
+                autoCapitalize="none"
+                autoCorrect="off"
+                className="login-field"
+              />
             </div>
-          )}
 
-          {error && <p className="text-sm text-red-400 -mt-3">{error}</p>}
+            {needsPassword && (
+              <div className="fade-in">
+                <label htmlFor="login-password" className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="login-password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                    className="login-field"
+                    style={{ paddingRight: 48 }}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    {...pressProps}
+                    aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1"
+                    style={{ color: 'var(--text-muted)' }}>
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+            )}
 
-          <button type="submit" disabled={loading}
-            {...pressProps}
-            className={`w-full py-3 rounded-lg text-sm font-semibold ${loading ? 'opacity-60' : ''}`}
-            style={{ background: 'var(--accent)', color: 'white' }}>
-            {loading ? 'Memeriksa...' : 'Masuk'}
-          </button>
-        </form>
-      </div>
+            {error && <p className="text-sm text-red-400">{error}</p>}
+
+            <button type="submit" disabled={loading}
+              {...pressProps}
+              className={`w-full h-14 mt-2 rounded-2xl text-base font-semibold flex items-center justify-center gap-2 ${loading ? 'opacity-60' : ''}`}
+              style={{ background: 'var(--accent)', color: 'white', boxShadow: '0 8px 24px -8px rgba(0,168,132,0.55)' }}>
+              {loading ? 'Memeriksa...' : <>Masuk <ArrowRight size={18} /></>}
+            </button>
+          </form>
+        </div>
+      </main>
     </div>
   )
 }
