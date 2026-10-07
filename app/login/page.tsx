@@ -72,82 +72,87 @@ export default function LoginPage() {
     }
   }
 
-  const inputStyle = { background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)' }
+  // Input minimalis: hanya garis bawah. font 16px biar tidak auto-zoom di iOS.
+  const inputStyle = {
+    background: 'transparent',
+    border: 'none',
+    borderBottom: '1px solid var(--border)',
+    color: 'var(--text)',
+  }
+  const focusLine = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderBottomColor = 'var(--accent)' }
+  const blurLine = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderBottomColor = 'var(--border)' }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'radial-gradient(ellipse at 50% 0%, #1f331a 0%, #0f1710 60%)' }}>
-      <div className="w-full max-w-sm fade-in">
+    <div className="min-h-screen flex flex-col justify-center px-7 py-10" style={{ background: '#0f1710' }}>
+      <div className="w-full max-w-sm mx-auto fade-in">
 
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 overflow-hidden"
-            style={{ boxShadow: '0 0 40px #63f19950' }}>
-            <img src="/logo.png" alt="STIE-PB" className="w-full h-full object-cover" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">KELAS 25MA 2</h1>
+        {/* Header */}
+        <div className="mb-12">
+          <img src="/logo.png" alt="STIE-PB" className="w-11 h-11 rounded-full object-cover mb-6" />
+          <h1 className="text-2xl font-semibold tracking-tight text-white">Kelas 25MA 2</h1>
           <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Sistem Kelas Digital</p>
         </div>
 
         {/* Form */}
-        <div className="rounded-2xl p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-                NIM atau username
+        <form onSubmit={handleSubmit} className="space-y-7">
+          <div>
+            <label htmlFor="login-id" className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
+              NIM atau username
+            </label>
+            <input
+              id="login-id"
+              type="text"
+              value={id}
+              onChange={e => { setId(e.target.value); setError('') }}
+              placeholder="Masukkan NIM kamu"
+              required
+              autoCapitalize="none"
+              autoCorrect="off"
+              className="w-full py-3 text-base outline-none transition-colors"
+              style={inputStyle}
+              onFocus={focusLine}
+              onBlur={blurLine}
+            />
+          </div>
+
+          {needsPassword && (
+            <div className="fade-in">
+              <label htmlFor="login-password" className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
+                Password
               </label>
-              <input
-                type="text"
-                value={id}
-                onChange={e => { setId(e.target.value); setError('') }}
-                placeholder="Masukkan NIM kamu"
-                required
-                autoCapitalize="none"
-                autoCorrect="off"
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                style={inputStyle}
-                onFocus={e => e.target.style.borderColor = 'var(--accent)'}
-                onBlur={e => e.target.style.borderColor = 'var(--border)'}
-              />
-            </div>
-
-            {needsPassword && (
-              <div className="fade-in">
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder="Password"
-                    required
-                    className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                    style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = 'var(--accent)'}
-                    onBlur={e => e.target.style.borderColor = 'var(--border)'}
-                  />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    {...pressProps}
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
-                    style={{ color: 'var(--text-muted)' }}>
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
+              <div className="relative">
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Password"
+                  required
+                  className="w-full py-3 pr-9 text-base outline-none transition-colors"
+                  style={inputStyle}
+                  onFocus={focusLine}
+                  onBlur={blurLine}
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  {...pressProps}
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 p-1"
+                  style={{ color: 'var(--text-muted)' }}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-            )}
+            </div>
+          )}
 
-            {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-400 -mt-3">{error}</p>}
 
-            <button type="submit" disabled={loading}
-              {...pressProps}
-              className={`w-full py-3 rounded-xl text-sm font-semibold ${loading ? 'opacity-60' : ''}`}
-              style={{ background: 'var(--accent)', color: 'white' }}>
-              {loading ? 'Memeriksa...' : 'Masuk'}
-            </button>
-          </form>
-        </div>
+          <button type="submit" disabled={loading}
+            {...pressProps}
+            className={`w-full py-3 rounded-lg text-sm font-semibold ${loading ? 'opacity-60' : ''}`}
+            style={{ background: 'var(--accent)', color: 'white' }}>
+            {loading ? 'Memeriksa...' : 'Masuk'}
+          </button>
+        </form>
       </div>
     </div>
   )
