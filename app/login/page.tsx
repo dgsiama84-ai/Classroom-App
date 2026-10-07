@@ -1,5 +1,5 @@
 'use client'
-import { Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, CalendarCheck, Wallet, ClipboardList } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -8,7 +8,7 @@ import {
 } from '@/lib/auth'
 import { pressProps } from '@/components/pressProps'
 
-// Style field + perbaikan autofill Chrome (yang bikin input jadi biru muda & teks hitam)
+// Semua warna pakai variabel root. Termasuk perbaikan autofill Chrome.
 const loginCss = `
 .login-field {
   width: 100%;
@@ -21,7 +21,7 @@ const loginCss = `
   background: var(--surface2);
   border: 1px solid var(--border);
   color-scheme: dark;
-  transition: border-color .15s, box-shadow .15s, background-color .15s;
+  transition: border-color .15s, box-shadow .15s;
 }
 .login-field::placeholder { color: var(--text-dim); }
 .login-field:focus {
@@ -36,7 +36,19 @@ const loginCss = `
   -webkit-box-shadow: 0 0 0 1000px var(--surface2) inset;
   transition: background-color 9999s ease-in-out 0s;
 }
+@keyframes login-sheet-up {
+  from { transform: translateY(32px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.login-sheet { animation: login-sheet-up .45s cubic-bezier(.2,.8,.2,1) both; }
+@media (prefers-reduced-motion: reduce) { .login-sheet { animation: none; } }
 `
+
+const FITUR = [
+  { icon: CalendarCheck, label: 'Absensi' },
+  { icon: ClipboardList, label: 'Tugas' },
+  { icon: Wallet, label: 'Kas' },
+]
 
 export default function LoginPage() {
   const router = useRouter()
@@ -103,40 +115,64 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#0f1710' }}>
+    <div className="relative flex flex-col overflow-hidden" style={{ minHeight: '100dvh' }}>
       <style>{loginCss}</style>
 
-      {/* Cahaya tipis di pojok atas, cuma aksen */}
-      <div aria-hidden className="pointer-events-none absolute -top-40 -right-32 w-96 h-96 rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(0,168,132,0.16) 0%, transparent 70%)' }} />
+      {/* Hiasan geometris: lingkaran konsentris di pojok kanan atas */}
+      <div aria-hidden className="pointer-events-none absolute" style={{ top: -150, right: -150 }}>
+        {[300, 220, 140].map(s => (
+          <div key={s} className="absolute rounded-full"
+            style={{ width: s * 2, height: s * 2, top: 300 - s, left: 300 - s, border: '1px solid var(--border)' }} />
+        ))}
+        <div style={{ width: 600, height: 600 }} />
+      </div>
 
-      {/* Atas: logo + nama */}
-      <header className="relative flex items-center gap-3 px-7 pt-10">
-        <img src="/logo.png" alt="STIE-PB" className="w-10 h-10 rounded-full object-cover" />
-        <span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Kelas 25MA 2</span>
-      </header>
+      {/* Hero */}
+      <section className="relative flex-1 flex flex-col justify-end px-7 pt-14 pb-10 min-h-0">
+        <div className="w-16 h-16 rounded-full p-1 mb-8 shrink-0"
+          style={{ background: 'var(--accent-soft)', border: '1px solid var(--border)' }}>
+          <img src="/logo.png" alt="STIE-PB" className="w-full h-full rounded-full object-cover" />
+        </div>
 
-      {/* Tengah: judul + form */}
-      <main className="relative flex-1 flex flex-col justify-center px-7 pb-16">
-        <div className="w-full max-w-sm mx-auto fade-in">
-          <h1 className="text-[34px] leading-tight font-bold tracking-tight text-white">
-            Masuk ke<br />kelas digital
-          </h1>
-          <p className="text-sm mt-3 mb-10" style={{ color: 'var(--text-muted)' }}>
+        <p className="text-2xl font-medium" style={{ color: 'var(--text-muted)' }}>Kelas</p>
+        <h1 className="font-extrabold tracking-tight leading-none"
+          style={{ fontSize: 'clamp(52px, 17vw, 72px)', color: 'var(--text)' }}>
+          25MA 2
+        </h1>
+        <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>Sistem Kelas Digital</p>
+
+        <div className="flex flex-wrap gap-2 mt-6">
+          {FITUR.map(({ icon: Icon, label }) => (
+            <span key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+              <Icon size={14} style={{ color: 'var(--accent-light)' }} /> {label}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* Sheet form di bawah, gampang dijangkau jempol */}
+      <section className="login-sheet relative px-7 pt-8 pb-10 shrink-0"
+        style={{
+          background: 'var(--surface)',
+          borderTop: '1px solid var(--border)',
+          borderRadius: '32px 32px 0 0',
+        }}>
+        <div className="w-full max-w-sm mx-auto">
+          <h2 className="text-xl font-bold mb-1">Masuk</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
             Mahasiswa cukup pakai NIM. Staff pakai username dan password.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="login-id" className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-                NIM atau username
-              </label>
+              <label htmlFor="login-id" className="sr-only">NIM atau username</label>
               <input
                 id="login-id"
                 type="text"
                 value={id}
                 onChange={e => { setId(e.target.value); setError('') }}
-                placeholder="Masukkan NIM kamu"
+                placeholder="NIM atau username"
                 required
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -146,9 +182,7 @@ export default function LoginPage() {
 
             {needsPassword && (
               <div className="fade-in">
-                <label htmlFor="login-password" className="block text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-                  Password
-                </label>
+                <label htmlFor="login-password" className="sr-only">Password</label>
                 <div className="relative">
                   <input
                     id="login-password"
@@ -171,17 +205,21 @@ export default function LoginPage() {
               </div>
             )}
 
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && <p className="text-sm" style={{ color: 'var(--danger)' }}>{error}</p>}
 
             <button type="submit" disabled={loading}
               {...pressProps}
-              className={`w-full h-14 mt-2 rounded-2xl text-base font-semibold flex items-center justify-center gap-2 ${loading ? 'opacity-60' : ''}`}
-              style={{ background: 'var(--accent)', color: 'white', boxShadow: '0 8px 24px -8px rgba(0,168,132,0.55)' }}>
+              className={`w-full h-14 rounded-2xl text-base font-semibold flex items-center justify-center gap-2 ${loading ? 'opacity-60' : ''}`}
+              style={{
+                background: 'var(--accent)',
+                color: 'var(--on-accent)',
+                boxShadow: '0 10px 24px -10px var(--accent)',
+              }}>
               {loading ? 'Memeriksa...' : <>Masuk <ArrowRight size={18} /></>}
             </button>
           </form>
         </div>
-      </main>
+      </section>
     </div>
   )
 }
