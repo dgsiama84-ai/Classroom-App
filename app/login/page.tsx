@@ -53,7 +53,11 @@ export default function LoginPage() {
       saveBendaharaSession(json.bendahara, json.token)
       router.push('/bendahara/kas')
     } else {
+<<<<<<< HEAD
       saveAdminSession(json.admin, json.token)
+=======
+      saveAdminSession(json.admin)
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       router.push('/admin/absensi')
     }
   }

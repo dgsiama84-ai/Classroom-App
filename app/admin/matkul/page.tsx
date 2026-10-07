@@ -6,8 +6,11 @@ import { BookOpen, User, Plus } from 'lucide-react'
 import Spinner from '@/components/Spinner'
 import { pressProps } from '@/components/pressProps'
 
+<<<<<<< HEAD
 import SemesterFilter from '@/components/SemesterFilter'
 import { semesterQuery } from '@/lib/hooks/useSemesterList'
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 import { MataKuliah } from '@/lib/types'
 
 export default function AdminMatkulPage() {
@@ -24,18 +27,30 @@ useEffect(() => {
   const [error, setError] = useState('')
   const [deleting, setDeleting] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+<<<<<<< HEAD
   // '' = semester aktif (default), 'all' = semua, atau id semester
   const [semester, setSemester] = useState('')
 
   async function load(sem: string) {
     setLoading(true)
     const res = await fetch(`/api/matkul${semesterQuery(sem)}`)
+=======
+  const [showAll, setShowAll] = useState(false)
+
+  async function load(all: boolean) {
+    setLoading(true)
+    const res = await fetch(`/api/matkul${all ? '?all=true' : ''}`)
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     const json = await res.json()
     setList(json.data || [])
     setLoading(false)
   }
 
+<<<<<<< HEAD
   useEffect(() => { load(semester) }, [semester])
+=======
+  useEffect(() => { load(showAll) }, [showAll])
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   async function handleAdd() {
     if (!kode || !nama) { setError('Kode dan nama wajib diisi'); return }
@@ -52,7 +67,11 @@ useEffect(() => {
 
     if (!res.ok) { setError(json.error); return }
     setKode(''); setNama(''); setDosen(''); setShowForm(false)
+<<<<<<< HEAD
     load(semester)
+=======
+    load(showAll)
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   }
 
   async function handleDelete(id: string) {
@@ -64,7 +83,11 @@ useEffect(() => {
       body: JSON.stringify({ id }),
     })
     setDeleting(null)
+<<<<<<< HEAD
     load(semester)
+=======
+    load(showAll)
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   }
 
   return (
@@ -78,10 +101,21 @@ useEffect(() => {
         </button>
       </div>
       <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+<<<<<<< HEAD
         {list.length} mata kuliah
       </p>
 
       <SemesterFilter value={semester} onChange={setSemester} />
+=======
+        {list.length} mata kuliah {showAll ? '(semua semester)' : '(semester aktif)'}
+      </p>
+
+      <button onClick={() => setShowAll(v => !v)} {...pressProps}
+        className="text-xs font-medium mb-4 px-3 py-1.5 rounded-lg"
+        style={{ background: 'var(--surface2)', color: 'var(--accent-light)', border: '1px solid var(--border)' }}>
+        {showAll ? 'Tampilkan semester aktif aja' : 'Lihat semua semester (termasuk lama)'}
+      </button>
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
       {/* Form tambah */}
       {showForm && (

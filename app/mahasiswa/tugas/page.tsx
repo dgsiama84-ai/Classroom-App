@@ -3,8 +3,11 @@ import Spinner from '@/components/Spinner'
 import { useEffect, useState } from 'react'
 import { formatDateTime } from '@/lib/utils'
 import { Inbox } from 'lucide-react'
+<<<<<<< HEAD
 import SemesterFilter from '@/components/SemesterFilter'
 import { semesterQuery } from '@/lib/hooks/useSemesterList'
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
 interface Tugas {
   id: string
@@ -28,6 +31,7 @@ export default function TugasPage() {
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
 
+<<<<<<< HEAD
   // '' = semester aktif (default), 'all' = semua, atau id semester
   const [semester, setSemester] = useState('')
 
@@ -37,6 +41,13 @@ export default function TugasPage() {
       .then(r => r.json())
       .then(json => { setData(json.data || []); setLoading(false) })
   }, [semester])
+=======
+  useEffect(() => {
+    fetch('/api/tugas')
+      .then(r => r.json())
+      .then(json => { setData(json.data || []); setLoading(false) })
+  }, [])
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   const active = data.filter(t => !isOverdue(t.deadline))
   const overdue = data.filter(t => isOverdue(t.deadline))
@@ -78,6 +89,7 @@ export default function TugasPage() {
     )
   }
 
+<<<<<<< HEAD
   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-1">Daftar Tugas</h2>
@@ -90,6 +102,20 @@ export default function TugasPage() {
       {loading ? (
         <Spinner />
       ) : data.length === 0 ? (
+=======
+  if (loading) return (
+    <Spinner />
+  )
+
+  return (
+    <div className="p-4">
+      <h2 className="text-lg font-bold mb-1">Daftar Tugas</h2>
+      <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+        {active.length} tugas aktif
+      </p>
+
+      {data.length === 0 ? (
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
         <div className="text-center py-16">
           <Inbox size={40} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
           <p style={{ color: 'var(--text-muted)' }}>Belum ada tugas</p>

@@ -6,8 +6,11 @@ import { getBendaharaSession, clearSession } from '@/lib/auth'
 import { pressProps } from '@/components/pressProps'
 import Card from '@/components/Card'
 import Spinner from '@/components/Spinner'
+<<<<<<< HEAD
 import SemesterFilter from '@/components/SemesterFilter'
 import { semesterQuery } from '@/lib/hooks/useSemesterList'
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 import { formatRupiah, parseRupiah, formatTanggalPendek } from '@/lib/kas'
 
 interface Periode {
@@ -16,7 +19,10 @@ interface Periode {
   nominal: number
   sudah_bayar: number
   terkumpul: number
+<<<<<<< HEAD
   semester_nama?: string | null
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 }
 
 interface MahasiswaStatus {
@@ -70,16 +76,23 @@ export default function IuranPage() {
   const [q, setQ] = useState('')
   const [copied, setCopied] = useState(false)
 
+<<<<<<< HEAD
   // '' = semester aktif (default, diatur admin), 'all' = semua, atau id semester
   const [semester, setSemester] = useState('')
 
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   function expired() {
     clearSession()
     router.replace('/login')
   }
 
   async function loadList() {
+<<<<<<< HEAD
     const { res, json } = await iuranFetch(`/api/iuran${semesterQuery(semester)}`)
+=======
+    const { res, json } = await iuranFetch('/api/iuran')
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     if (res.status === 401 || res.status === 403) return expired()
     if (!res.ok) {
       setError(json.error || 'Gagal memuat iuran')
@@ -110,10 +123,16 @@ export default function IuranPage() {
       router.replace('/login')
       return
     }
+<<<<<<< HEAD
     setLoading(true)
     loadList()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester])
+=======
+    loadList()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   function openPeriode(id: string) {
     setSelectedId(id)
@@ -481,12 +500,19 @@ export default function IuranPage() {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-1">Iuran Kelas</h2>
+<<<<<<< HEAD
       <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
         Periode iuran per semester — cicilan diperbolehkan
       </p>
 
       <SemesterFilter value={semester} onChange={setSemester} />
 
+=======
+      <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+        Periode iuran per semester — cicilan diperbolehkan
+      </p>
+
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       {!loading && error && (
         <p className="text-xs mb-3" style={{ color: 'var(--danger)' }}>
           {error}
@@ -498,10 +524,14 @@ export default function IuranPage() {
       ) : periode.length === 0 ? (
         <div className="text-center py-14">
           <AlertCircle size={40} className="mx-auto mb-3" style={{ color: 'var(--text-dim)' }} />
+<<<<<<< HEAD
           <p style={{ color: 'var(--text-muted)' }}>Belum ada periode iuran di semester ini</p>
           <p className="text-sm mt-1" style={{ color: 'var(--text-dim)' }}>
             Periode iuran dibuat admin lewat halaman Semester
           </p>
+=======
+          <p style={{ color: 'var(--text-muted)' }}>Belum ada periode iuran</p>
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
         </div>
       ) : (
         <div className="space-y-3">
@@ -521,7 +551,10 @@ export default function IuranPage() {
                       <p className="text-sm font-semibold truncate">{p.nama}</p>
                       <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                         {formatRupiah(p.nominal)} per orang
+<<<<<<< HEAD
                         {semester === 'all' && p.semester_nama ? ` · ${p.semester_nama}` : ''}
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
                       </p>
                     </div>
                     <div className="text-right shrink-0">

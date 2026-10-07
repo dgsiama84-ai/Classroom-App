@@ -6,8 +6,11 @@ import { getBendaharaSession, clearSession } from '@/lib/auth'
 import { pressProps } from '@/components/pressProps'
 import Card from '@/components/Card'
 import Spinner from '@/components/Spinner'
+<<<<<<< HEAD
 import SemesterFilter from '@/components/SemesterFilter'
 import { semesterQuery } from '@/lib/hooks/useSemesterList'
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 import {
   KAS_KATEGORI, formatRupiah, parseRupiah, formatTanggalPendek,
   type KasTransaksi, type KasRingkasan,
@@ -16,9 +19,15 @@ import { nowInMakassar } from '@/lib/utils'
 
 type Trx = KasTransaksi & { periode_id?: string | null }
 
+<<<<<<< HEAD
 async function kasFetch(options: RequestInit = {}, query = '') {
   const token = localStorage.getItem('bendahara_token')
   const res = await fetch(`/api/kas${query}`, {
+=======
+async function kasFetch(options: RequestInit = {}) {
+  const token = localStorage.getItem('bendahara_token')
+  const res = await fetch('/api/kas', {
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     ...options,
     headers: {
       ...(options.body ? { 'Content-Type': 'application/json' } : {}),
@@ -40,10 +49,13 @@ export default function KasPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
+<<<<<<< HEAD
   // '' = semester aktif (default, diatur admin), 'all' = semua, atau id semester
   const [semester, setSemester] = useState('')
   const [saldoTotal, setSaldoTotal] = useState(0)
 
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   // Form (khusus pengeluaran)
   const [jumlahText, setJumlahText] = useState('')
   const [keterangan, setKeterangan] = useState('')
@@ -56,18 +68,26 @@ export default function KasPage() {
   }
 
   async function load() {
+<<<<<<< HEAD
     const { res, json } = await kasFetch({}, semesterQuery(semester))
+=======
+    const { res, json } = await kasFetch()
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     if (res.status === 401) return sessionExpired()
     if (!res.ok) { setError(json.error || 'Gagal memuat data kas'); setLoading(false); return }
     setList(json.data || [])
     setRingkasan(json.ringkasan)
+<<<<<<< HEAD
     setSaldoTotal(json.saldo_total ?? json.ringkasan?.saldo ?? 0)
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     setLoading(false)
   }
 
   useEffect(() => {
     if (!getBendaharaSession()) { router.replace('/login'); return }
     setTanggal(nowInMakassar().tanggal)
+<<<<<<< HEAD
   }, [])
 
   useEffect(() => {
@@ -76,6 +96,11 @@ export default function KasPage() {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester])
+=======
+    load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   function formatJumlahInput(v: string) {
     const n = parseRupiah(v)
@@ -151,12 +176,19 @@ export default function KasPage() {
           {showForm ? '✕ Tutup' : '+ Pengeluaran'}
         </button>
       </div>
+<<<<<<< HEAD
       <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
         Pemasukan otomatis dari iuran · 25MA2
       </p>
 
       <SemesterFilter value={semester} onChange={setSemester} />
 
+=======
+      <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+        Pemasukan otomatis dari iuran · 25MA2
+      </p>
+
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       {/* Ringkasan */}
       <Card className="p-5 mb-4">
         <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
@@ -176,11 +208,14 @@ export default function KasPage() {
             <div className="text-sm font-semibold" style={{ color: 'var(--danger)' }}>{formatRupiah(ringkasan.pengeluaran)}</div>
           </div>
         </div>
+<<<<<<< HEAD
         {semester !== 'all' && (
           <p className="text-[11px] mt-3" style={{ color: 'var(--text-dim)' }}>
             Total kas semua semester: {formatRupiah(saldoTotal)}
           </p>
         )}
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
         <button onClick={copyLaporan} {...pressProps} disabled={list.length === 0}
           className="w-full mt-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
           style={{ background: 'transparent', border: '1px solid var(--border)', color: copied ? 'var(--accent-light)' : 'var(--text-muted)', opacity: list.length === 0 ? 0.5 : 1 }}>

@@ -6,8 +6,11 @@ import { useRouter } from 'next/navigation'
 import { getAdminSession } from '@/lib/auth'
 import Select from '@/components/select'
 import Spinner from '@/components/Spinner'
+<<<<<<< HEAD
 import SemesterFilter from '@/components/SemesterFilter'
 import { semesterQuery } from '@/lib/hooks/useSemesterList'
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 import { MataKuliah } from '@/lib/types'
 
 interface Tugas {
@@ -35,6 +38,7 @@ useEffect(() => {
   const [deadlineDate, setDeadlineDate] = useState('')
   const [deadlineTime, setDeadlineTime] = useState('')
   const deadline = deadlineDate ? `${deadlineDate}T${deadlineTime || '23:59'}` : null
+<<<<<<< HEAD
 
   // '' = semester aktif (default), 'all' = semua, atau id semester
   const [semester, setSemester] = useState('')
@@ -43,13 +47,24 @@ useEffect(() => {
     const [tugasRes, matkulRes] = await Promise.all([
       fetch(`/api/tugas${semesterQuery(semester)}`).then(r => r.json()),
       fetch('/api/matkul').then(r => r.json()), // form tambah tugas: cuma matkul semester aktif
+=======
+  
+  async function load() {
+    const [tugasRes, matkulRes] = await Promise.all([
+      fetch('/api/tugas').then(r => r.json()),
+      fetch('/api/matkul').then(r => r.json()),
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     ])
     setList(tugasRes.data || [])
     setMatkulList(matkulRes.data || [])
     setLoading(false)
   }
 
+<<<<<<< HEAD
   useEffect(() => { load() }, [semester])
+=======
+  useEffect(() => { load() }, [])
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   async function handleAdd() {
     if (!matkulId || !judul || !deadline) { setError('Semua field wajib diisi'); return }
@@ -92,9 +107,13 @@ useEffect(() => {
          {showForm ? '✕ Tutup' : '+ Tambah'}
         </button>
       </div>
+<<<<<<< HEAD
       <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>{list.length} tugas</p>
 
       <SemesterFilter value={semester} onChange={setSemester} />
+=======
+      <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>{list.length} tugas</p>
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
       {showForm && (
         <div className="rounded-2xl p-4 mb-5 space-y-3 fade-in"

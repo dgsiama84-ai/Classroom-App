@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { signStaffToken, signAdminToken, safeEqual } from '@/lib/admin-auth'
+=======
+import { signStaffToken, safeEqual } from '@/lib/admin-auth'
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
 // Login gabungan admin + bendahara. Role ditentukan dari kredensial yang cocok.
 export async function POST(req: NextRequest) {
@@ -29,11 +33,17 @@ export async function POST(req: NextRequest) {
   const aUser = process.env.ADMIN_USERNAME || 'admin'
   const aPass = process.env.ADMIN_PASSWORD || 'admin123'
   if (safeEqual(u, aUser) && safeEqual(p, aPass)) {
+<<<<<<< HEAD
     const token = await signAdminToken(aUser)
     return NextResponse.json({
       success: true,
       role: 'admin',
       token,
+=======
+    return NextResponse.json({
+      success: true,
+      role: 'admin',
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       admin: { username: aUser, nama: process.env.ADMIN_NAMA || aUser, role: 'admin' },
     })
   }

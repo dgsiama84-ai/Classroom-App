@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+<<<<<<< HEAD
 import { resolveSemesterScope } from '@/lib/semester'
 
 // Tugas ikut semester lewat mata kuliahnya.
@@ -16,6 +17,19 @@ export async function GET(req: NextRequest) {
 
   if (mata_kuliah_id) query = query.eq('mata_kuliah_id', mata_kuliah_id)
   if (!scope.all) query = query.eq('mata_kuliah.semester_id', scope.id)
+=======
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const mata_kuliah_id = searchParams.get('mata_kuliah_id')
+
+  let query = supabaseAdmin
+    .from('tugas')
+    .select(`*, mata_kuliah(kode, nama)`)
+    .order('deadline', { ascending: true })
+
+  if (mata_kuliah_id) query = query.eq('mata_kuliah_id', mata_kuliah_id)
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   const { data, error } = await query
 

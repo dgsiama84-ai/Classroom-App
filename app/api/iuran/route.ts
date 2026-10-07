@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { requireRole } from '@/lib/admin-auth'
 import { nowInMakassar } from '@/lib/utils'
+<<<<<<< HEAD
 import { resolveSemesterScope } from '@/lib/semester'
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
 // GET /api/iuran → daftar periode + progres ringkas
 // GET /api/iuran?periode_id=<id> → detail: seluruh mahasiswa + status bayar (support cicilan)
@@ -10,6 +13,7 @@ export async function GET(req: NextRequest) {
   const auth = await requireRole(req, ['bendahara'])
   if (auth instanceof NextResponse) return auth
 
+<<<<<<< HEAD
   const searchParams = new URL(req.url).searchParams
   const periodeId = searchParams.get('periode_id')
 
@@ -42,6 +46,25 @@ export async function GET(req: NextRequest) {
           .in('periode_id', periodeIds)
           .eq('jenis', 'pemasukan')
       : { data: [], error: null }
+=======
+  const periodeId = new URL(req.url).searchParams.get('periode_id')
+
+  if (!periodeId) {
+    // Daftar periode (harus ada minimal 2: Semester 1 & 2)
+    const { data: periodeData, error: periodeErr } = await supabaseAdmin
+      .from('iuran_periode')
+      .select('id, nama, nominal, created_at')
+      .order('nama')
+
+    if (periodeErr) return NextResponse.json({ error: periodeErr.message }, { status: 500 })
+
+    // Hitung progres per periode
+    const { data: bayarData, error: bayarErr } = await supabaseAdmin
+      .from('kas_transaksi')
+      .select('periode_id, nim, jumlah')
+      .not('periode_id', 'is', null)
+      .eq('jenis', 'pemasukan')
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
     if (bayarErr) return NextResponse.json({ error: bayarErr.message }, { status: 500 })
 
@@ -54,7 +77,11 @@ export async function GET(req: NextRequest) {
       progres.set(b.periode_id, cur)
     }
 
+<<<<<<< HEAD
     const data = periodeData.map(({ semester_urutan, ...p }) => ({
+=======
+    const data = (periodeData ?? []).map(p => ({
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       ...p,
       nominal: Number(p.nominal),
       sudah_bayar: progres.get(p.id)?.unik.size ?? 0,
@@ -156,7 +183,11 @@ export async function POST(req: NextRequest) {
   // Validasi periode & mahasiswa
   const { data: periode, error: periodeErr } = await supabaseAdmin
     .from('iuran_periode')
+<<<<<<< HEAD
     .select('nama, nominal, semester_id')
+=======
+    .select('nama, nominal')
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     .eq('id', periode_id)
     .single()
 
@@ -186,7 +217,10 @@ export async function POST(req: NextRequest) {
       tanggal: nowInMakassar().tanggal,
       dibuat_oleh: auth.username,
       periode_id,
+<<<<<<< HEAD
       semester_id: periode.semester_id,
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       nim,
     })
     .select('id, jumlah, tanggal')

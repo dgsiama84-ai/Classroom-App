@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { google } from 'googleapis'
+<<<<<<< HEAD
 import { getSemesterAktifId } from '@/lib/semester'
+=======
+import { ACTIVE_SEMESTER } from '@/lib/config'
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
 async function getSheets() {
   const auth = new google.auth.GoogleAuth({
@@ -72,6 +76,7 @@ async function runSync() {
     ?.map(s => s.properties?.title ?? '')
     .filter(t => t !== 'Mahasiswa' && t !== '') ?? []
 
+<<<<<<< HEAD
   const semesterId = await getSemesterAktifId()
   if (!semesterId) throw new Error('Belum ada semester aktif')
 
@@ -79,6 +84,12 @@ async function runSync() {
     .from('mata_kuliah')
     .select('id, kode, nama')
     .eq('semester_id', semesterId)
+=======
+  const { data: matkulList, error: matkulError } = await supabaseAdmin
+    .from('mata_kuliah')
+    .select('id, kode, nama')
+    .eq('semester', ACTIVE_SEMESTER)
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   if (matkulError || !matkulList) {
     throw new Error('Gagal ambil data matkul')

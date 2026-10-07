@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { requireRole } from '@/lib/admin-auth'
 import { nowInMakassar } from '@/lib/utils'
+<<<<<<< HEAD
 import { getSemesterAktifId, resolveSemesterScope } from '@/lib/semester'
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
 const JENIS = ['pemasukan', 'pengeluaran']
 
@@ -10,28 +13,43 @@ export async function GET(req: NextRequest) {
   const admin = await requireRole(req, ['bendahara'])
   if (admin instanceof NextResponse) return admin
 
+<<<<<<< HEAD
   const scope = await resolveSemesterScope(new URL(req.url).searchParams)
 
   const { data, error } = await supabaseAdmin
     .from('kas_transaksi')
     .select('id, jenis, jumlah, keterangan, kategori, tanggal, created_at, periode_id, semester_id')
+=======
+  const { data, error } = await supabaseAdmin
+    .from('kas_transaksi')
+    .select('id, jenis, jumlah, keterangan, kategori, tanggal, created_at, periode_id')
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     .order('tanggal', { ascending: false })
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+<<<<<<< HEAD
   const all = data ?? []
   const rows = scope.all ? all : all.filter(r => r.semester_id === scope.id)
   const sum = (list: typeof all, jenis: string) =>
     list.filter(r => r.jenis === jenis).reduce((s, r) => s + Number(r.jumlah), 0)
   const pemasukan = sum(rows, 'pemasukan')
   const pengeluaran = sum(rows, 'pengeluaran')
+=======
+  const rows = data ?? []
+  const pemasukan = rows.filter(r => r.jenis === 'pemasukan').reduce((s, r) => s + Number(r.jumlah), 0)
+  const pengeluaran = rows.filter(r => r.jenis === 'pengeluaran').reduce((s, r) => s + Number(r.jumlah), 0)
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   return NextResponse.json({
     data: rows,
     ringkasan: { pemasukan, pengeluaran, saldo: pemasukan - pengeluaran },
+<<<<<<< HEAD
     // Total kas di semua semester (buat info; ringkasan di atas per semester yang dipilih)
     saldo_total: sum(all, 'pemasukan') - sum(all, 'pengeluaran'),
+=======
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   })
 }
 
@@ -56,6 +74,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Keterangan wajib diisi (maks 120 karakter)' }, { status: 400 })
   }
 
+<<<<<<< HEAD
   // Transaksi manual (pengeluaran) otomatis masuk semester aktif
   const semesterId = await getSemesterAktifId()
   if (!semesterId) {
@@ -66,6 +85,12 @@ export async function POST(req: NextRequest) {
     .from('kas_transaksi')
     .insert({ jenis, jumlah, keterangan, kategori, tanggal, dibuat_oleh: admin.username, semester_id: semesterId })
     .select('id, jenis, jumlah, keterangan, kategori, tanggal, created_at, semester_id')
+=======
+  const { data, error } = await supabaseAdmin
+    .from('kas_transaksi')
+    .insert({ jenis, jumlah, keterangan, kategori, tanggal, dibuat_oleh: admin.username })
+    .select('id, jenis, jumlah, keterangan, kategori, tanggal, created_at')
+>>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
