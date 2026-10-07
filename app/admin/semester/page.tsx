@@ -6,9 +6,7 @@ import { getAdminSession, getAdminToken, clearSession } from '@/lib/auth'
 import { pressProps } from '@/components/pressProps'
 import Spinner from '@/components/Spinner'
 import { Semester } from '@/lib/types'
-import { parseRupiah } from '@/lib/kas'
 
-interface IuranRow { nama: string; nominal: string }
 interface MatkulRow { kode: string; nama: string; dosen: string }
 
 const inputStyle = { background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)' }
@@ -36,7 +34,6 @@ export default function AdminSemesterPage() {
   const [nama, setNama] = useState('')
   const [tahunAjaran, setTahunAjaran] = useState('')
   const [aktif, setAktif] = useState(true)
-  const [iuran, setIuran] = useState<IuranRow[]>([{ nama: '', nominal: '' }])
   const [matkul, setMatkul] = useState<MatkulRow[]>([{ kode: '', nama: '', dosen: '' }])
 
   const aktifSekarang = list.find(s => s.is_aktif)
@@ -66,11 +63,6 @@ export default function AdminSemesterPage() {
     setError('')
   }
 
-  // Kalau nama periode iuran masih kosong, otomatis pakai nama semester
-  function periodeNamaDefault(row: IuranRow) {
-    return row.nama.trim() || nama.trim()
-  }
-
   async function handleAktifkan(s: Semester) {
     if (!confirm(`Jadikan "${s.nama} (${s.tahun_ajaran})" sebagai semester aktif?\n\nSemua halaman mahasiswa, admin, dan bendahara akan langsung ikut semester ini.`)) return
     setSwitching(s.id)
@@ -91,7 +83,6 @@ export default function AdminSemesterPage() {
       nama,
       tahun_ajaran: tahunAjaran,
       aktif,
-      iuran: iuran.map(r => ({ nama: periodeNamaDefault(r), nominal: parseRupiah(r.nominal) })),
       matkul,
     })
     setSaving(false)
@@ -101,13 +92,10 @@ export default function AdminSemesterPage() {
 
     setShowForm(false)
     setNama(''); setTahunAjaran(''); setAktif(true)
-    setIuran([{ nama: '', nominal: '' }])
     setMatkul([{ kode: '', nama: '', dosen: '' }])
     load()
   }
 
-  const updateIuran = (i: number, patch: Partial<IuranRow>) =>
-    setIuran(rows => rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)))
   const updateMatkul = (i: number, patch: Partial<MatkulRow>) =>
     setMatkul(rows => rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)))
 
@@ -148,43 +136,6 @@ export default function AdminSemesterPage() {
             </div>
           </div>
 
-          {/* Periode iuran */}
-          <div>
-            <p className="text-xs font-semibold mb-1" style={{ color: 'var(--text-muted)' }}>Periode iuran (opsional)</p>
-            <p className="text-[11px] mb-2" style={{ color: 'var(--text-dim)' }}>
-              Nominal = tagihan wajib per orang (lunas kalau total bayar sudah mencapai nominal, cicilan boleh).
-              Nama dikosongkan = pakai nama semester. Bendahara juga bisa nambah periode sendiri nanti.
-            </p>
-            <div className="space-y-2">
-              {iuran.map((r, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <input value={r.nama} onChange={e => updateIuran(i, { nama: e.target.value })}
-                    placeholder={nama.trim() || 'Nama periode'}
-                    className="flex-1 min-w-0 px-3 py-2.5 rounded-xl text-sm outline-none" style={inputStyle} />
-                  <div className="flex items-center rounded-xl px-3 w-36 shrink-0" style={inputStyle}>
-                    <span className="text-xs mr-1.5" style={{ color: 'var(--text-muted)' }}>Rp</span>
-                    <input value={r.nominal} inputMode="numeric" placeholder="0"
-                      onChange={e => {
-                        const n = parseRupiah(e.target.value)
-                        updateIuran(i, { nominal: n ? n.toLocaleString('id-ID') : '' })
-                      }}
-                      className="w-full py-2.5 text-sm outline-none bg-transparent" style={{ color: 'var(--text)' }} />
-                  </div>
-                  {iuran.length > 1 && (
-                    <button onClick={() => setIuran(rows => rows.filter((_, idx) => idx !== i))} {...pressProps}
-                      aria-label="Hapus periode" style={{ color: 'var(--text-dim)' }}>
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setIuran(rows => [...rows, { nama: '', nominal: '' }])} {...pressProps}
-              className="text-xs mt-2 flex items-center gap-1" style={{ color: 'var(--accent-light)' }}>
-              <Plus size={14} /> Tambah periode
-            </button>
-          </div>
-
           {/* Mata kuliah */}
           <div>
             <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>Mata kuliah (opsional)</p>
@@ -220,6 +171,7 @@ export default function AdminSemesterPage() {
               Langsung jadikan semester aktif
               <span className="block text-xs" style={{ color: 'var(--text-muted)' }}>
                 {aktifSekarang?.nama ?? 'Semester sebelumnya'} otomatis dinonaktifkan (datanya tetap aman).
+                Periode iuran dibuat bendahara dari halaman Iuran.
               </span>
             </span>
           </label>
