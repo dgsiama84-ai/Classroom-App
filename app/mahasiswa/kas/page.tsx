@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowDownLeft, ArrowUpRight, CheckCircle2, AlertCircle, Clock, Wallet } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, CheckCircle2, AlertCircle, Clock, Wallet, Receipt } from 'lucide-react'
 import { getMahasiswaSession, clearSession } from '@/lib/auth'
 import Card from '@/components/Card'
 import Spinner from '@/components/Spinner'
@@ -71,7 +71,11 @@ export default function KasMahasiswaPage() {
     )
   }
 
-  const { ringkasan, iuran, riwayat, total_mahasiswa, saldo_total } = data
+  const ringkasan = data.ringkasan ?? { pemasukan: 0, pengeluaran: 0, saldo: 0 }
+  const iuran = data.iuran ?? []
+  const riwayat = data.riwayat ?? []
+  const total_mahasiswa = data.total_mahasiswa ?? 0
+  const saldo_total = data.saldo_total
 
   return (
     <div className="p-4">
@@ -112,60 +116,68 @@ export default function KasMahasiswaPage() {
         )}
       </Card>
 
-      {/* Iuran saya */}
-      <h3 className="text-sm font-semibold mb-2">Iuran kamu</h3>
-      {iuran.length === 0 && (
-        <p className="text-sm text-center py-6 mb-4" style={{ color: 'var(--text-muted)' }}>
-          Belum ada iuran di semester ini
-        </p>
-      )}
-      <div className="space-y-3 mb-6">
-        {iuran.map(p => {
-          const pct = total_mahasiswa > 0 ? Math.round((p.lunas / total_mahasiswa) * 100) : 0
-          const s = p.saya
-          return (
-            <Card key={p.id} className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 shrink-0">
-                  {s.status === 'lunas' && <CheckCircle2 size={22} style={{ color: 'var(--accent-light)' }} />}
-                  {s.status === 'kurang' && <AlertCircle size={22} style={{ color: 'var(--warning)' }} />}
-                  {s.status === 'belum bayar' && <Clock size={22} style={{ color: 'var(--danger)' }} />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold">{p.nama}</p>
-                  <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
-                    Tagihan {formatRupiah(p.nominal)}
-                  </p>
-                  {s.status === 'lunas' && (
-                    <p className="text-xs" style={{ color: 'var(--accent-light)' }}>
-                      ✓ Lunas ({formatRupiah(s.totalBayar)})
-                    </p>
-                  )}
-                  {s.status === 'kurang' && (
-                    <p className="text-xs" style={{ color: 'var(--warning)' }}>
-                      ◐ Sudah {formatRupiah(s.totalBayar)}, kurang {formatRupiah(s.sisa)}
-                    </p>
-                  )}
-                  {s.status === 'belum bayar' && (
-                    <p className="text-xs" style={{ color: 'var(--danger)' }}>○ Belum bayar</p>
-                  )}
-                </div>
-              </div>
+      {/* Iuran saya: judul hanya tampil kalau ada periode */}
+      {iuran.length === 0 ? (
+        <Card className="p-5 mb-6 text-center">
+          <Receipt size={28} className="mx-auto mb-2" style={{ color: 'var(--text-dim)' }} />
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            {semester === 'all'
+              ? 'Belum ada periode iuran sama sekali'
+              : 'Bendahara belum membuat periode iuran semester ini'}
+          </p>
+        </Card>
+      ) : (
+        <>
+          <h3 className="text-sm font-semibold mb-2">Iuran kamu</h3>
+          <div className="space-y-3 mb-6">
+            {iuran.map(p => {
+              const pct = total_mahasiswa > 0 ? Math.min(100, Math.round((p.lunas / total_mahasiswa) * 100)) : 0
+              const s = p.saya
+              return (
+                <Card key={p.id} className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 shrink-0">
+                      {s.status === 'lunas' && <CheckCircle2 size={22} style={{ color: 'var(--accent-light)' }} />}
+                      {s.status === 'kurang' && <AlertCircle size={22} style={{ color: 'var(--warning)' }} />}
+                      {s.status === 'belum bayar' && <Clock size={22} style={{ color: 'var(--danger)' }} />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold">{p.nama}</p>
+                      <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
+                        Tagihan {formatRupiah(p.nominal)}
+                      </p>
+                      {s.status === 'lunas' && (
+                        <p className="text-xs" style={{ color: 'var(--accent-light)' }}>
+                          ✓ Lunas ({formatRupiah(s.totalBayar)})
+                        </p>
+                      )}
+                      {s.status === 'kurang' && (
+                        <p className="text-xs" style={{ color: 'var(--warning)' }}>
+                          ◐ Sudah {formatRupiah(s.totalBayar)}, kurang {formatRupiah(s.sisa)}
+                        </p>
+                      )}
+                      {s.status === 'belum bayar' && (
+                        <p className="text-xs" style={{ color: 'var(--danger)' }}>○ Belum bayar</p>
+                      )}
+                    </div>
+                  </div>
 
-              {/* Progres kelas: jumlah saja, tanpa nama */}
-              <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-                <div className="flex justify-between text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
-                  <span>{p.lunas} dari {total_mahasiswa} sudah lunas</span>
-                  <span>{pct}%</span>
-                </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
-                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)' }} />
-                </div>
-              </div>
-            </Card>
-          )
-        })}
-      </div>
+                  {/* Progres kelas: jumlah saja, tanpa nama */}
+                  <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
+                    <div className="flex justify-between text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                      <span>{p.lunas} dari {total_mahasiswa} sudah lunas</span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface2)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)' }} />
+                    </div>
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
+        </>
+      )}
 
       {/* Riwayat pengeluaran */}
       <h3 className="text-sm font-semibold mb-2">Pengeluaran & pemasukan lain</h3>
