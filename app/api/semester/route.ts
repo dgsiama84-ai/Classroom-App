@@ -13,10 +13,10 @@ export async function GET() {
   return NextResponse.json({ data })
 }
 
-interface IuranInput { nama?: string; nominal?: number | string }
 interface MatkulInput { kode?: string; nama?: string; dosen?: string }
 
-// POST /api/semester (admin) → bikin semester baru + periode iuran + mata kuliah sekaligus.
+// POST /api/semester (admin) → bikin semester baru + mata kuliah sekaligus.
+// Periode iuran BUKAN urusan admin: bendahara yang bikin dari halaman Iuran.
 // Semuanya jalan di satu transaksi database: kalau satu gagal, tidak ada yang tersimpan.
 export async function POST(req: NextRequest) {
   const auth = await requireAdmin(req)
@@ -35,17 +35,6 @@ export async function POST(req: NextRequest) {
   }
 
   // Baris kosong dibuang; baris setengah terisi ditolak biar nggak ada data nyasar.
-  const iuran: { nama: string; nominal: number }[] = []
-  for (const row of (Array.isArray(body.iuran) ? body.iuran : []) as IuranInput[]) {
-    const n = String(row.nama ?? '').trim()
-    const nominalRaw = row.nominal === undefined || row.nominal === '' ? 0 : Number(row.nominal)
-    if (!n && !nominalRaw) continue
-    if (!n || !Number.isInteger(nominalRaw) || nominalRaw <= 0 || nominalRaw > 100_000_000) {
-      return NextResponse.json({ error: 'Periode iuran: nama dan nominal (angka bulat > 0) wajib diisi' }, { status: 400 })
-    }
-    iuran.push({ nama: n, nominal: nominalRaw })
-  }
-
   const matkul: { kode: string; nama: string; dosen: string }[] = []
   for (const row of (Array.isArray(body.matkul) ? body.matkul : []) as MatkulInput[]) {
     const kode = String(row.kode ?? '').trim()
@@ -62,7 +51,6 @@ export async function POST(req: NextRequest) {
     p_nama: nama,
     p_tahun_ajaran: tahunAjaran,
     p_aktif: aktif,
-    p_iuran: iuran,
     p_matkul: matkul,
   })
 
