@@ -152,7 +152,8 @@ export default function AdminSemesterPage() {
           <div>
             <p className="text-xs font-semibold mb-1" style={{ color: 'var(--text-muted)' }}>Periode iuran (opsional)</p>
             <p className="text-[11px] mb-2" style={{ color: 'var(--text-dim)' }}>
-              Nama dikosongkan = pakai nama semester. Bisa tambah periode lain kalau perlu.
+              Nominal = tagihan wajib per orang (lunas kalau total bayar sudah mencapai nominal, cicilan boleh).
+              Nama dikosongkan = pakai nama semester. Bendahara juga bisa nambah periode sendiri nanti.
             </p>
             <div className="space-y-2">
               {iuran.map((r, i) => (
@@ -218,7 +219,7 @@ export default function AdminSemesterPage() {
             <span>
               Langsung jadikan semester aktif
               <span className="block text-xs" style={{ color: 'var(--text-muted)' }}>
-                Semester {aktifSekarang?.nama ?? 'sebelumnya'} otomatis dinonaktifkan (datanya tetap aman).
+                {aktifSekarang?.nama ?? 'Semester sebelumnya'} otomatis dinonaktifkan (datanya tetap aman).
               </span>
             </span>
           </label>
