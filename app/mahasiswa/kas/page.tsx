@@ -5,11 +5,8 @@ import { ArrowDownLeft, ArrowUpRight, CheckCircle2, AlertCircle, Clock, Wallet }
 import { getMahasiswaSession, clearSession } from '@/lib/auth'
 import Card from '@/components/Card'
 import Spinner from '@/components/Spinner'
-<<<<<<< HEAD
 import SemesterFilter from '@/components/SemesterFilter'
 import { semesterQuery } from '@/lib/hooks/useSemesterList'
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 import { formatRupiah, formatTanggalPendek } from '@/lib/kas'
 
 interface IuranInfo {
@@ -32,10 +29,7 @@ interface Riwayat {
 
 interface Data {
   ringkasan: { pemasukan: number; pengeluaran: number; saldo: number }
-<<<<<<< HEAD
   saldo_total?: number
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   total_mahasiswa: number
   iuran: IuranInfo[]
   riwayat: Riwayat[]
@@ -46,40 +40,26 @@ export default function KasMahasiswaPage() {
   const [data, setData] = useState<Data | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-<<<<<<< HEAD
   // '' = semester aktif (default, diatur admin), 'all' = semua, atau id semester
   const [semester, setSemester] = useState('')
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   useEffect(() => {
     if (!getMahasiswaSession()) { router.replace('/login'); return }
 
     async function load() {
       const token = localStorage.getItem('token')
-<<<<<<< HEAD
       const res = await fetch(`/api/mahasiswa/kas${semesterQuery(semester)}`, {
-=======
-      const res = await fetch('/api/mahasiswa/kas', {
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
         headers: { Authorization: `Bearer ${token ?? ''}` },
       })
       const json = await res.json().catch(() => ({}))
       if (res.status === 401) { clearSession(); router.replace('/login'); return }
       if (!res.ok) { setError(json.error || 'Gagal memuat data kas'); setLoading(false); return }
-<<<<<<< HEAD
       setError('')
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       setData(json)
       setLoading(false)
     }
     load()
-<<<<<<< HEAD
   }, [router, semester])
-=======
-  }, [router])
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   if (loading) return <div className="p-4"><Spinner /></div>
 
@@ -91,28 +71,17 @@ export default function KasMahasiswaPage() {
     )
   }
 
-<<<<<<< HEAD
   const { ringkasan, iuran, riwayat, total_mahasiswa, saldo_total } = data
-=======
-  const { ringkasan, iuran, riwayat, total_mahasiswa } = data
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-1">Kas Kelas</h2>
-<<<<<<< HEAD
       <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
         Transparansi uang kas · 25MA2
       </p>
 
       <SemesterFilter value={semester} onChange={setSemester} />
 
-=======
-      <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
-        Transparansi uang kas · 25MA2
-      </p>
-
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       {/* Saldo */}
       <Card className="p-5 mb-4">
         <div className="flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
@@ -136,26 +105,20 @@ export default function KasMahasiswaPage() {
             </div>
           </div>
         </div>
-<<<<<<< HEAD
         {semester !== 'all' && saldo_total !== undefined && (
           <p className="text-[11px] mt-3" style={{ color: 'var(--text-dim)' }}>
             Total kas semua semester: {formatRupiah(saldo_total)}
           </p>
         )}
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       </Card>
 
       {/* Iuran saya */}
       <h3 className="text-sm font-semibold mb-2">Iuran kamu</h3>
-<<<<<<< HEAD
       {iuran.length === 0 && (
         <p className="text-sm text-center py-6 mb-4" style={{ color: 'var(--text-muted)' }}>
           Belum ada iuran di semester ini
         </p>
       )}
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       <div className="space-y-3 mb-6">
         {iuran.map(p => {
           const pct = total_mahasiswa > 0 ? Math.round((p.lunas / total_mahasiswa) * 100) : 0

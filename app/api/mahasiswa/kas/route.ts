@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-<<<<<<< HEAD
 import { resolveSemesterScope } from '@/lib/semester'
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!)
 
@@ -26,7 +23,6 @@ export async function GET(req: NextRequest) {
   const nim = await getNim(req)
   if (!nim) return NextResponse.json({ error: 'Sesi tidak valid' }, { status: 401 })
 
-<<<<<<< HEAD
   // Default semester aktif. ?semester=<id> atau ?semester=all untuk yang lain.
   const scope = await resolveSemesterScope(new URL(req.url).searchParams)
 
@@ -38,13 +34,6 @@ export async function GET(req: NextRequest) {
     supabaseAdmin
       .from('kas_transaksi')
       .select('id, jenis, jumlah, keterangan, kategori, tanggal, created_at, periode_id, semester_id, nim')
-=======
-  const [periodeRes, trxRes, mhsRes] = await Promise.all([
-    supabaseAdmin.from('iuran_periode').select('id, nama, nominal').order('nama'),
-    supabaseAdmin
-      .from('kas_transaksi')
-      .select('id, jenis, jumlah, keterangan, kategori, tanggal, created_at, periode_id, nim')
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       .order('tanggal', { ascending: false })
       .order('created_at', { ascending: false }),
     supabaseAdmin.from('mahasiswa').select('nim', { count: 'exact', head: true }),
@@ -53,7 +42,6 @@ export async function GET(req: NextRequest) {
   if (periodeRes.error) return NextResponse.json({ error: periodeRes.error.message }, { status: 500 })
   if (trxRes.error) return NextResponse.json({ error: trxRes.error.message }, { status: 500 })
 
-<<<<<<< HEAD
   const trxSemua = trxRes.data ?? []
   const trx = scope.all ? trxSemua : trxSemua.filter(t => t.semester_id === scope.id)
   const totalMahasiswa = mhsRes.count ?? 0
@@ -64,14 +52,6 @@ export async function GET(req: NextRequest) {
   const pemasukan = hitung(trx, 'pemasukan')
   const pengeluaran = hitung(trx, 'pengeluaran')
   const saldoTotal = hitung(trxSemua, 'pemasukan') - hitung(trxSemua, 'pengeluaran')
-=======
-  const trx = trxRes.data ?? []
-  const totalMahasiswa = mhsRes.count ?? 0
-
-  // Ringkasan saldo
-  const pemasukan = trx.filter(t => t.jenis === 'pemasukan').reduce((s, t) => s + Number(t.jumlah), 0)
-  const pengeluaran = trx.filter(t => t.jenis === 'pengeluaran').reduce((s, t) => s + Number(t.jumlah), 0)
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   // Iuran per periode + status milik si peminta saja
   const iuran = (periodeRes.data ?? []).map(p => {
@@ -112,10 +92,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     ringkasan: { pemasukan, pengeluaran, saldo: pemasukan - pengeluaran },
-<<<<<<< HEAD
     saldo_total: saldoTotal,
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     total_mahasiswa: totalMahasiswa,
     iuran,
     riwayat,

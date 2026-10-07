@@ -3,21 +3,14 @@ import { pressProps } from '@/components/pressProps'
 import { getAdminSession, clearSession } from '@/lib/auth'
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-<<<<<<< HEAD
 import { ClipboardList, BookOpen, GraduationCap, CalendarDays } from 'lucide-react'
-=======
-import { ClipboardList, BookOpen, GraduationCap } from 'lucide-react'
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 import { useSwipeNav } from '@/components/useSwipeNav'
 
 const navItems = [
   { href: '/admin/absensi', label: 'Absensi', icon: <ClipboardList size={20} /> },
   { href: '/admin/tugas', label: 'Tugas', icon: <BookOpen size={20} /> },
   { href: '/admin/matkul', label: 'Mata Kuliah', icon: <GraduationCap size={20} /> },
-<<<<<<< HEAD
   { href: '/admin/semester', label: 'Semester', icon: <CalendarDays size={20} /> },
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -20,10 +20,7 @@ export interface BendaharaSession {
 export const SESSION_KEYS = {
   MAHASISWA: 'mahasiswa_session',
   ADMIN: 'admin_session',
-<<<<<<< HEAD
   ADMIN_TOKEN: 'admin_token',
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   BENDAHARA: 'bendahara_session',
   BENDAHARA_TOKEN: 'bendahara_token',
 }
@@ -55,7 +52,6 @@ export function saveMahasiswaSession(session: MahasiswaSession) {
   localStorage.setItem(SESSION_KEYS.MAHASISWA, JSON.stringify(session))
 }
 
-<<<<<<< HEAD
 export function saveAdminSession(session: AdminSession, token?: string) {
   localStorage.setItem(SESSION_KEYS.ADMIN, JSON.stringify(session))
   if (token) localStorage.setItem(SESSION_KEYS.ADMIN_TOKEN, token)
@@ -65,10 +61,6 @@ export function saveAdminSession(session: AdminSession, token?: string) {
 export function getAdminToken(): string | null {
   if (typeof window === 'undefined') return null
   return localStorage.getItem(SESSION_KEYS.ADMIN_TOKEN)
-=======
-export function saveAdminSession(session: AdminSession) {
-  localStorage.setItem(SESSION_KEYS.ADMIN, JSON.stringify(session))
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 }
 
 export function saveBendaharaSession(session: BendaharaSession, token: string) {
@@ -79,10 +71,7 @@ export function saveBendaharaSession(session: BendaharaSession, token: string) {
 export function clearSession() {
   localStorage.removeItem(SESSION_KEYS.MAHASISWA)
   localStorage.removeItem(SESSION_KEYS.ADMIN)
-<<<<<<< HEAD
   localStorage.removeItem(SESSION_KEYS.ADMIN_TOKEN)
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   localStorage.removeItem(SESSION_KEYS.BENDAHARA)
   localStorage.removeItem(SESSION_KEYS.BENDAHARA_TOKEN)
 }

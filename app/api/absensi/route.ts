@@ -211,11 +211,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from('absensi')
-<<<<<<< HEAD
       .select('*, mata_kuliah:mata_kuliah_id(kode, nama, semester_id)')
-=======
-      .select('*, mata_kuliah:mata_kuliah_id(kode, nama, semester)')
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
       .eq('nim', mahasiswa.nim)
       .order('tanggal', { ascending: false })
 

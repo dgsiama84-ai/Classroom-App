@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { google } from 'googleapis'
-<<<<<<< HEAD
 import { getSemesterAktifId } from '@/lib/semester'
-=======
-import { ACTIVE_SEMESTER } from '@/lib/config'
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
 async function getSheets() {
   const auth = new google.auth.GoogleAuth({
@@ -31,18 +27,11 @@ export async function GET() {
       .filter(t => t !== 'Mahasiswa' && t !== '') // skip tab mahasiswa
       ?? []
 
-<<<<<<< HEAD
     const semesterId = await getSemesterAktifId()
     const { data: matkulList } = await supabaseAdmin
       .from('mata_kuliah')
       .select('id, kode, nama')
       .eq('semester_id', semesterId ?? '00000000-0000-0000-0000-000000000000')
-=======
-    const { data: matkulList } = await supabaseAdmin
-      .from('mata_kuliah')
-      .select('id, kode, nama')
-      .eq('semester', ACTIVE_SEMESTER)
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
     return NextResponse.json({ success: true, tabs, matkulList })
   } catch (err) {

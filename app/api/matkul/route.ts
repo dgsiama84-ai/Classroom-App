@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-<<<<<<< HEAD
 import { getSemesterAktifId, resolveSemesterScope } from '@/lib/semester'
 
 // GET /api/matkul                  → mata kuliah semester aktif
@@ -29,49 +28,23 @@ export async function GET(req: NextRequest) {
 // POST: mata kuliah baru otomatis masuk semester aktif (kecuali semester_id dikirim eksplisit).
 export async function POST(req: NextRequest) {
   const { kode, nama, dosen, semester_id } = await req.json()
-=======
-import { ACTIVE_SEMESTER } from '@/lib/config'
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const showAll = searchParams.get('all') === 'true'
-
-  let query = supabaseAdmin.from('mata_kuliah').select('*').order('kode')
-  if (!showAll) query = query.eq('semester', ACTIVE_SEMESTER)
-
-  const { data, error } = await query
-
-  if (error) return Response.json({ error: error.message }, { status: 500 })
-  return Response.json({ data })
-}
-
-export async function POST(req: NextRequest) {
-  const { kode, nama, dosen, semester } = await req.json()
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
 
   if (!kode || !nama) {
     return NextResponse.json({ error: 'Kode dan nama wajib diisi' }, { status: 400 })
   }
 
-<<<<<<< HEAD
   const semesterId = semester_id || (await getSemesterAktifId())
   if (!semesterId) {
     return NextResponse.json({ error: 'Belum ada semester aktif. Atur dulu di halaman Semester.' }, { status: 400 })
   }
 
-=======
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
   const { data, error } = await supabaseAdmin
     .from('mata_kuliah')
     .insert({
       kode: kode.trim().toUpperCase(),
       nama: nama.trim(),
       dosen: dosen?.trim() || null,
-<<<<<<< HEAD
       semester_id: semesterId,
-=======
-      semester: semester?.trim() || ACTIVE_SEMESTER,
->>>>>>> 428493411cf03b72a0d0b4ecd241ba935bc6caae
     })
     .select()
     .single()
