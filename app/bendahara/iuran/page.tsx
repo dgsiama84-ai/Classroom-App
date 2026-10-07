@@ -7,7 +7,7 @@ import { pressProps } from '@/components/pressProps'
 import Card from '@/components/Card'
 import Spinner from '@/components/Spinner'
 import SemesterFilter from '@/components/SemesterFilter'
-import { semesterQuery } from '@/lib/hooks/useSemesterList'
+import { semesterQuery, useSemesterList } from '@/lib/hooks/useSemesterList'
 import { formatRupiah, parseRupiah, formatTanggalPendek } from '@/lib/kas'
 
 interface Periode {
@@ -72,6 +72,14 @@ export default function IuranPage() {
 
   // '' = semester aktif (default, diatur admin), 'all' = semua, atau id semester
   const [semester, setSemester] = useState('')
+  const semesterAktif = useSemesterList().find(s => s.is_aktif)
+
+  // Form periode iuran baru (selalu masuk ke semester aktif)
+  const [showPeriodeForm, setShowPeriodeForm] = useState(false)
+  const [namaPeriode, setNamaPeriode] = useState('')
+  const [nominalText, setNominalText] = useState('')
+  const [savingPeriode, setSavingPeriode] = useState(false)
+  const [periodeError, setPeriodeError] = useState('')
 
   function expired() {
     clearSession()
@@ -114,6 +122,47 @@ export default function IuranPage() {
     loadList()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester])
+
+  function toggleFormPeriode() {
+    setPeriodeError('')
+    setNamaPeriode(semesterAktif?.nama ?? '')
+    setNominalText('')
+    setShowPeriodeForm(v => !v)
+  }
+
+  async function handleTambahPeriode() {
+    const nominal = parseRupiah(nominalText)
+    if (!namaPeriode.trim() || !nominal) {
+      setPeriodeError('Nama periode dan nominal wajib diisi')
+      return
+    }
+    setSavingPeriode(true)
+    setPeriodeError('')
+    const { res, json } = await iuranFetch('/api/iuran/periode', {
+      method: 'POST',
+      body: JSON.stringify({ nama: namaPeriode, nominal }),
+    })
+    setSavingPeriode(false)
+
+    if (res.status === 401 || res.status === 403) return expired()
+    if (!res.ok) { setPeriodeError(json.error || 'Gagal menyimpan periode'); return }
+
+    setShowPeriodeForm(false)
+    setSemester('') // balik ke semester aktif biar periode barunya langsung kelihatan
+    setLoading(true)
+    loadList()
+  }
+
+  async function handleHapusPeriode(p: Periode) {
+    if (!confirm(`Hapus periode "${p.nama}"? (Belum ada pembayaran, jadi aman.)`)) return
+    const { res, json } = await iuranFetch('/api/iuran/periode', {
+      method: 'DELETE',
+      body: JSON.stringify({ id: p.id }),
+    })
+    if (res.status === 401 || res.status === 403) return expired()
+    if (!res.ok) { setError(json.error || 'Gagal menghapus periode'); return }
+    loadList()
+  }
 
   function openPeriode(id: string) {
     setSelectedId(id)
@@ -480,10 +529,60 @@ export default function IuranPage() {
   /* ───────── DAFTAR PERIODE ───────── */
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-1">Iuran Kelas</h2>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-xl font-bold">Iuran Kelas</h2>
+        <button onClick={toggleFormPeriode} {...pressProps}
+          className="text-sm px-3 py-1.5 rounded-lg font-semibold"
+          style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>
+          {showPeriodeForm ? '✕ Tutup' : '+ Periode'}
+        </button>
+      </div>
       <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
         Periode iuran per semester — cicilan diperbolehkan
       </p>
+
+      {showPeriodeForm && (
+        <Card className="p-4 mb-4 space-y-3 fade-in">
+          <div className="text-sm font-semibold">Periode iuran baru</div>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            Masuk ke {semesterAktif ? `${semesterAktif.nama} (${semesterAktif.tahun_ajaran})` : 'semester aktif'}.
+          </p>
+
+          <div>
+            <label className="text-xs block mb-1.5" style={{ color: 'var(--text-muted)' }}>Nama periode</label>
+            <input value={namaPeriode} onChange={e => setNamaPeriode(e.target.value)} maxLength={60}
+              placeholder="mis. Semester 3"
+              className="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style={inputStyle} />
+          </div>
+
+          <div>
+            <label className="text-xs block mb-1.5" style={{ color: 'var(--text-muted)' }}>
+              Tagihan per orang (wajib)
+            </label>
+            <div className="flex items-center rounded-xl px-3" style={inputStyle}>
+              <span className="text-sm mr-2" style={{ color: 'var(--text-muted)' }}>Rp</span>
+              <input value={nominalText} inputMode="numeric" placeholder="0"
+                onChange={e => {
+                  const n = parseRupiah(e.target.value)
+                  setNominalText(n ? n.toLocaleString('id-ID') : '')
+                }}
+                className="w-full py-2.5 text-lg font-semibold outline-none bg-transparent"
+                style={{ color: 'var(--text)' }} />
+            </div>
+            <p className="text-[11px] mt-1.5" style={{ color: 'var(--text-dim)' }}>
+              Lunas kalau total bayar sudah mencapai nominal ini. Cicilan boleh.
+            </p>
+          </div>
+
+          {periodeError && <p className="text-xs" style={{ color: 'var(--danger)' }}>{periodeError}</p>}
+
+          <button onClick={handleTambahPeriode} disabled={savingPeriode} {...pressProps}
+            className="w-full py-3 rounded-xl text-sm font-semibold"
+            style={{ background: 'var(--accent)', color: 'var(--on-accent)', opacity: savingPeriode ? 0.6 : 1 }}>
+            {savingPeriode ? 'Menyimpan...' : 'Simpan periode'}
+          </button>
+        </Card>
+      )}
 
       <SemesterFilter value={semester} onChange={setSemester} />
 
@@ -500,7 +599,7 @@ export default function IuranPage() {
           <AlertCircle size={40} className="mx-auto mb-3" style={{ color: 'var(--text-dim)' }} />
           <p style={{ color: 'var(--text-muted)' }}>Belum ada periode iuran di semester ini</p>
           <p className="text-sm mt-1" style={{ color: 'var(--text-dim)' }}>
-            Periode iuran dibuat admin lewat halaman Semester
+            Tap + Periode di atas untuk bikin
           </p>
         </div>
       ) : (
@@ -543,6 +642,12 @@ export default function IuranPage() {
                     Terkumpul {formatRupiah(p.terkumpul)}
                   </p>
                 </button>
+                {p.terkumpul === 0 && (
+                  <button onClick={() => handleHapusPeriode(p)} className="text-[11px] mt-2"
+                    style={{ color: 'var(--text-dim)' }}>
+                    Hapus periode
+                  </button>
+                )}
               </Card>
             )
           })}
