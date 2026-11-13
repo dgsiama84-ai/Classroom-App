@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
   const { data: mahasiswa, error: mhsErr } = await supabaseAdmin
     .from('mahasiswa')
     .select('nim, nama, kelas')
-    .order('nama')
+    .order('nim')
 
   if (mhsErr) return NextResponse.json({ error: mhsErr.message }, { status: 500 })
 
